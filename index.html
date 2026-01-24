@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>JSmol 分子点群交互演示</title>
+<title>JSmol 分子点群 + H₂O σᵥ(xz)</title>
 
 <script src="jsmol/JSmol.min.js"></script>
 
@@ -11,10 +11,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   background: #f6f7f9;
   text-align: center;
-}
-
-h2 {
-  margin-top: 15px;
 }
 
 .panel {
@@ -57,40 +53,44 @@ button:hover {
 
 <body>
 
-<h2>分子点群 Cₙ 操作演示（JSmol）</h2>
+<h2>分子点群 Cₙ 操作演示（含 H₂O σᵥ(xz)）</h2>
+
+<!-- ================= 分子选择 ================= -->
 <div class="panel">
-  <strong>选择分子</strong><br>
+<strong>选择分子</strong><br>
 
-  <button onclick="selectMol('water.xyz', [2])">H₂O</button>
-  <button onclick="selectMol('h2o2.mol', [2])">H₂O₂</button>
+<button onclick="loadWater()">H₂O</button>
+<button onclick="selectMol('h2o2.mol', [2])">H₂O₂</button>
 
-  <button onclick="selectMol('C2H2Cl2.mol', [2])">C₂H₂Cl₂</button>
-  <button onclick="selectMol('CHCl3.mol', [3])">CHCl₃</button>
+<button onclick="selectMol('C2H2Cl2.mol', [2])">C₂H₂Cl₂</button>
+<button onclick="selectMol('CHCl3.mol', [3])">CHCl₃</button>
 
-  <button onclick="selectMol('ClHC=C=CHCl.mol', [2])">ClHC=C=CHCl</button>
-  <button onclick="selectMol('h3c-ccl3.mol', [3])">CH₃–CCl₃</button>
+<button onclick="selectMol('ClHC=C=CHCl.mol', [2])">ClHC=C=CHCl</button>
+<button onclick="selectMol('h3c-ccl3.mol', [3])">CH₃–CCl₃</button>
 
-  <button onclick="selectMol('CO2.mol', [2])">CO₂</button>
-  <button onclick="selectMol('BF3.mol', [3])">BF₃</button>
+<button onclick="selectMol('CO2.mol', [2])">CO₂</button>
+<button onclick="selectMol('BF3.mol', [3])">BF₃</button>
 
-  <button onclick="selectMol('C6H6.mol', [6,3,2])">C₆H₆</button>
-  <button onclick="selectMol('H2C=CH2.mol', [2])">H₂C=CH₂</button>
+<button onclick="selectMol('C6H6.mol', [6,3,2])">C₆H₆</button>
+<button onclick="selectMol('H2C=CH2.mol', [2])">H₂C=CH₂</button>
 
-  <button onclick="selectMol('H2CCCH2.mol', [2])">H₂CCCH₂</button>
-  <button onclick="selectMol('PtCl4(e2-).mol', [4,2])">PtCl₄²⁻</button>
+<button onclick="selectMol('H2CCCH2.mol', [2])">H₂CCCH₂</button>
+<button onclick="selectMol('PtCl4(e2-).mol', [4,2])">PtCl₄²⁻</button>
 
-  <button onclick="selectMol('SbCl5(e2-).mol', [5])">SbCl₅²⁻</button>
+<button onclick="selectMol('SbCl5(e2-).mol', [5])">SbCl₅²⁻</button>
 </div>
 
-<!-- ================= 点群操作 ================= -->
+<!-- ================= 对称操作 ================= -->
 <div class="panel">
-  <strong>可用对称操作（仅该分子允许的）</strong><br>
+<strong>可用对称操作</strong><br>
 
-  <button id="btnC2" class="hidden" onclick="doCn(2)">C₂</button>
-  <button id="btnC3" class="hidden" onclick="doCn(3)">C₃</button>
-  <button id="btnC4" class="hidden" onclick="doCn(4)">C₄</button>
-  <button id="btnC5" class="hidden" onclick="doCn(5)">C₅</button>
-  <button id="btnC6" class="hidden" onclick="doCn(6)">C₆</button>
+<button id="btnC2" class="hidden" onclick="doCn(2)">C₂</button>
+<button id="btnC3" class="hidden" onclick="doCn(3)">C₃</button>
+<button id="btnC4" class="hidden" onclick="doCn(4)">C₄</button>
+<button id="btnC5" class="hidden" onclick="doCn(5)">C₅</button>
+<button id="btnC6" class="hidden" onclick="doCn(6)">C₆</button>
+
+<button id="btnSigma" class="hidden" onclick="sigma_v_xz()">σᵥ(xz)</button>
 </div>
 
 <div id="viewer"></div>
@@ -98,28 +98,59 @@ button:hover {
 <script>
 Jmol.setDocument(0);
 
+/* ========= H₂O 基准模型 ========= */
+var waterBaseModel = `
+load data "model xyz"
+3
+H2O
+O  0.000  0.000  0.000
+H  0.000  0.757  0.586
+H  0.000 -0.757  0.586
+end "model xyz"
+
+set antialiasDisplay;
+spacefill 23%;
+wireframe 0.15;
+color oxygen red;
+color hydrogen white;
+`;
+
+/* ========= JSmol 初始化 ========= */
 var Info = {
   width: 420,
   height: 420,
   use: "HTML5",
   j2sPath: "jsmol/j2s",
-  backgroundColor: "white",
-  script: "set antialiasDisplay; set zoomLarge false;"
+  backgroundColor: "white"
 };
 
-var myJmol = Jmol.getApplet("myJmol", Info);
+var applet = Jmol.getApplet("myJmol", Info);
 document.getElementById("viewer").innerHTML =
-  Jmol.getAppletHtml(myJmol);
+  Jmol.getAppletHtml(applet);
 
-/* ========= 当前分子支持的 Cn ========= */
+/* ========= 当前 Cn ========= */
 var currentCn = [];
 
-/* ========= 选择分子 ========= */
-function selectMol(file, cnList) {
+/* ========= 加载水 ========= */
+function loadWater() {
+  currentCn = [2];
 
+  Jmol.script(applet, `
+    ${waterBaseModel}
+    center
+    zoom 140
+    calculate pointgroup
+    draw pointgroup
+  `);
+
+  updateButtons(true);
+}
+
+/* ========= 加载其它分子 ========= */
+function selectMol(file, cnList) {
   currentCn = cnList;
 
-  Jmol.script(myJmol, `
+  Jmol.script(applet, `
     load ${file}
     center
     zoom 120
@@ -128,11 +159,12 @@ function selectMol(file, cnList) {
     draw pointgroup
   `);
 
-  updateButtons();
+  updateButtons(false);
 }
 
-/* ========= 更新按钮显示 ========= */
-function updateButtons() {
+/* ========= 按钮更新 ========= */
+function updateButtons(isWater) {
+
   [2,3,4,5,6].forEach(n => {
     document.getElementById("btnC"+n).classList.add("hidden");
   });
@@ -140,17 +172,43 @@ function updateButtons() {
   currentCn.forEach(n => {
     document.getElementById("btnC"+n).classList.remove("hidden");
   });
+
+  document.getElementById("btnSigma")
+    .classList.toggle("hidden", !isWater);
 }
 
-/* ========= 执行 Cn ========= */
+/* ========= Cn ========= */
 function doCn(n) {
   var angle = 360 / n;
-  Jmol.script(myJmol, `
+  Jmol.script(applet, `
     spin $pgva_0_c${n}_1 ${angle} 60
   `);
+}
+
+/* ========= σᵥ(xz)：仅 H₂O ========= */
+function sigma_v_xz() {
+
+  Jmol.script(applet, waterBaseModel);
+
+  var y0 = 0.757;
+  var steps = 40;
+  var dy = (-2 * y0) / steps;
+
+  var script = "";
+
+  for (var i = 0; i < steps; i++) {
+    script += `
+      select atomno=2;
+      translateSelected {0 ${dy.toFixed(4)} 0};
+      select atomno=3;
+      translateSelected {0 ${(-dy).toFixed(4)} 0};
+      delay 0.05;
+    `;
+  }
+
+  Jmol.script(applet, script);
 }
 </script>
 
 </body>
 </html>
-
