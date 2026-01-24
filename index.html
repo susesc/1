@@ -2,512 +2,99 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>分子点群对称操作演示 | JSmol</title>
+<title>JSmol 分子点群 + H₂O σᵥ</title>
 
 <script src="jsmol/JSmol.min.js"></script>
 
 <style>
-/* 基础样式重置 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  color: #333;
-  line-height: 1.6;
-  min-height: 100vh;
-  padding: 20px;
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 30px;
-}
-
-@media (max-width: 1100px) {
-  .container {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-}
-
-/* 标题区域 */
-header {
-  grid-column: 1 / -1;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f6f7f9;
   text-align: center;
-  margin-bottom: 20px;
-  padding: 25px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  border-left: 5px solid #3498db;
-  border-right: 5px solid #27ae60;
 }
 
-h1 {
-  color: #2c3e50;
-  font-size: 2.4rem;
-  margin-bottom: 8px;
-  font-weight: 700;
+.panel {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px auto;
+  width: 90%;
+  max-width: 900px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.subtitle {
-  color: #7f8c8d;
-  font-size: 1.1rem;
-  font-weight: 400;
+button {
+  margin: 4px;
+  padding: 6px 14px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background: #fdfdfd;
 }
 
-/* 左侧：3D查看器 */
-.left-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-/* 右侧：控制面板 */
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-/* 卡片通用样式 */
-.card {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-top: 1px solid rgba(255, 255, 255, 0.8);
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-}
-
-.card-title {
-  font-size: 1.4rem;
-  color: #2c3e50;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #f0f0f0;
-  display: flex;
-  align-items: center;
-}
-
-.card-title i {
-  margin-right: 10px;
-}
-
-/* 3D查看器卡片 */
-.viewer-card .card-title i {
-  color: #3498db;
-}
-
-.viewer-container {
-  position: relative;
-  width: 100%;
-  height: 500px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+button:hover {
+  background: #e9eef5;
 }
 
 #viewer {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+  width: 420px;
+  height: 420px;
+  margin: 15px auto;
+  border: 1px solid #bbb;
+  background: white;
 }
 
-.viewer-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 12px 20px;
-  font-size: 0.9rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.viewer-controls {
-  display: flex;
-  gap: 10px;
-}
-
-.control-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.control-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* 分子选择卡片 */
-.molecule-card .card-title i {
-  color: #9b59b6;
-}
-
-.molecule-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
-}
-
-.mol-btn {
-  background: linear-gradient(to bottom, #ffffff, #f8f9fa);
-  color: #2c3e50;
-  border: 1px solid #e0e0e0;
-  padding: 14px 10px;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  font-weight: 500;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.mol-btn:hover {
-  background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  border-color: #3498db;
-}
-
-.mol-btn:active {
-  transform: translateY(0);
-}
-
-.mol-btn.water {
-  background: linear-gradient(to bottom, #e3f2fd, #bbdefb);
-  border-color: #90caf9;
-  color: #1565c0;
-}
-
-.mol-btn.water:hover {
-  background: linear-gradient(to bottom, #bbdefb, #90caf9);
-  border-color: #64b5f6;
-}
-
-/* 对称操作卡片 */
-.operations-card .card-title i {
-  color: #27ae60;
-}
-
-.operation-buttons {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.op-btn {
-  background: linear-gradient(to bottom, #27ae60, #219653);
-  color: white;
-  border: none;
-  padding: 16px 8px;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  font-weight: 600;
-  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
-}
-
-.op-btn:hover {
-  background: linear-gradient(to bottom, #219653, #1e8449);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
-}
-
-.op-btn:disabled {
-  background: linear-gradient(to bottom, #95a5a6, #7f8c8d);
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.op-btn.hidden {
+.hidden {
   display: none;
-}
-
-.sigma-btn {
-  background: linear-gradient(to bottom, #e74c3c, #c0392b);
-}
-
-.sigma-btn:hover {
-  background: linear-gradient(to bottom, #c0392b, #a93226);
-}
-
-/* 信息卡片 */
-.info-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  margin-top: 10px;
-}
-
-.info-card h3 {
-  color: #2c3e50;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-}
-
-.info-card h3 i {
-  margin-right: 10px;
-  color: #f39c12;
-}
-
-.info-card p {
-  color: #555;
-  margin-bottom: 10px;
-  line-height: 1.7;
-}
-
-.highlight {
-  background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 10px;
-  border-left: 4px solid #3498db;
-  margin-top: 15px;
-}
-
-/* 页脚 */
-footer {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 20px;
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  margin-top: 20px;
-}
-
-/* 图标样式 */
-.icon {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-.icon-molecule:before {
-  content: "⚛️";
-}
-
-.icon-symmetry:before {
-  content: "🔄";
-}
-
-.icon-viewer:before {
-  content: "👁️";
-}
-
-.icon-info:before {
-  content: "ℹ️";
-}
-
-.icon-water:before {
-  content: "💧";
-}
-
-/* 动画效果 */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.card, .viewer-container {
-  animation: fadeIn 0.5s ease-out;
-}
-
-/* 响应式调整 */
-@media (max-width: 1100px) {
-  .container {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .viewer-container {
-    height: 450px;
-  }
-  
-  .molecule-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .molecule-grid {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  }
-  
-  .operation-buttons {
-    grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
-  }
-  
-  h1 {
-    font-size: 2rem;
-  }
-  
-  .viewer-container {
-    height: 400px;
-  }
-}
-
-@media (max-width: 480px) {
-  .molecule-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .operation-buttons {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  h1 {
-    font-size: 1.8rem;
-  }
-  
-  .viewer-container {
-    height: 350px;
-  }
 }
 </style>
 </head>
 
 <body>
-<div class="container">
-  <!-- 标题区域 -->
-  <header>
-    <h1>分子点群对称操作演示</h1>
-    <p class="subtitle">使用JSmol交互式3D分子可视化工具，探索分子对称性与点群操作</p>
-  </header>
 
-  <!-- 左侧：3D查看器 -->
-  <div class="left-panel">
-    <div class="card viewer-card">
-      <div class="card-title">
-        <span class="icon icon-viewer"></span>
-        3D分子查看器
-      </div>
-      <div class="viewer-container">
-        <div id="viewer"></div>
-        <div class="viewer-overlay">
-          <span>使用鼠标控制: 左键旋转 | 右键平移 | 滚轮缩放</span>
-          <div class="viewer-controls">
-            <button class="control-btn" onclick="Jmol.script(applet, 'reset;')">重置视图</button>
-            <button class="control-btn" onclick="Jmol.script(applet, 'spin on;')">自动旋转</button>
-            <button class="control-btn" onclick="Jmol.script(applet, 'spin off;')">停止旋转</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 信息卡片 -->
-    <div class="info-card">
-      <h3><span class="icon icon-info"></span>关于分子对称性</h3>
-      <p>分子对称性是指分子经过某种对称操作后，其构型与原来构型不可区分的性质。</p>
-      <p>对称操作包括：旋转（Cₙ）、反射（σ）、反演（i）和旋转反射（Sₙ）。</p>
-      <p>一组完整的对称操作构成一个点群，用于描述分子的对称性分类。</p>
-      <div class="highlight">
-        <p><strong>当前操作提示：</strong> <span id="current-operation">请选择一个分子开始演示</span></p>
-      </div>
-    </div>
-  </div>
+<h2>分子点群 Cₙ 操作演示（含 H₂O σᵥ）</h2>
 
-  <!-- 右侧：控制面板 -->
-  <div class="right-panel">
-    <!-- 分子选择卡片 -->
-    <div class="card molecule-card">
-      <div class="card-title">
-        <span class="icon icon-molecule"></span>
-        选择分子结构
-      </div>
-      <div class="molecule-grid">
-        <button class="mol-btn water" onclick="loadWater()">H₂O (水分子)</button>
-        <button class="mol-btn" onclick="selectMol('h2o2.mol', [2])">H₂O₂</button>
-        <button class="mol-btn" onclick="selectMol('C2H2Cl2.mol', [2])">C₂H₂Cl₂</button>
-        <button class="mol-btn" onclick="selectMol('CHCl3.mol', [3])">CHCl₃</button>
-        <button class="mol-btn" onclick="selectMol('ClHC=C=CHCl.mol', [2])">ClHC=C=CHCl</button>
-        <button class="mol-btn" onclick="selectMol('h3c-ccl3.mol', [3])">CH₃–CCl₃</button>
-        <button class="mol-btn" onclick="selectMol('CO2.mol', [2])">CO₂</button>
-        <button class="mol-btn" onclick="selectMol('BF3.mol', [3])">BF₃</button>
-        <button class="mol-btn" onclick="selectMol('C6H6.mol', [6,3,2])">C₆H₆ (苯)</button>
-        <button class="mol-btn" onclick="selectMol('H2C=CH2.mol', [2])">H₂C=CH₂ (乙烯)</button>
-        <button class="mol-btn" onclick="selectMol('H2CCCH2.mol', [2])">H₂CCCH₂</button>
-        <button class="mol-btn" onclick="selectMol('PtCl4(e2-).mol', [4,2])">PtCl₄²⁻</button>
-        <button class="mol-btn" onclick="selectMol('SbCl5(e2-).mol', [5])">SbCl₅²⁻</button>
-      </div>
-    </div>
+<!-- ================= 分子选择 ================= -->
+<div class="panel">
+<strong>选择分子</strong><br>
 
-    <!-- 对称操作卡片 -->
-    <div class="card operations-card">
-      <div class="card-title">
-        <span class="icon icon-symmetry"></span>
-        对称操作
-      </div>
-      <div class="operation-buttons">
-        <button id="btnC2" class="op-btn hidden" onclick="doCn(2)">C₂</button>
-        <button id="btnC3" class="op-btn hidden" onclick="doCn(3)">C₃</button>
-        <button id="btnC4" class="op-btn hidden" onclick="doCn(4)">C₄</button>
-        <button id="btnC5" class="op-btn hidden" onclick="doCn(5)">C₅</button>
-        <button id="btnC6" class="op-btn hidden" onclick="doCn(6)">C₆</button>
-        <button id="btnSigma" class="op-btn sigma-btn hidden" onclick="sigma_v_xz()">σᵥ(xz)</button>
-        <button id="btnSigmaYZ" class="op-btn sigma-btn hidden" onclick="sigma_v_yz()">σᵥ(yz)</button>
-      </div>
-      <div class="highlight">
-        <p><strong>操作说明：</strong></p>
-        <p>1. 选择左侧的分子结构</p>
-        <p>2. 查看器将显示分子3D结构和对称元素</p>
-        <p>3. 相应的对称操作按钮将激活</p>
-        <p>4. 点击按钮观看动画效果</p>
-      </div>
-    </div>
-    
-    <!-- 关于水分子对称性 -->
-    <div class="info-card">
-      <h3><span class="icon icon-water"></span>水分子对称性 (C₂v)</h3>
-      <p>水分子具有以下对称元素：</p>
-      <ul style="margin-left: 20px; margin-top: 10px; margin-bottom: 10px;">
-        <li>恒等操作 (E)</li>
-        <li>二次旋转轴 (C₂)</li>
-        <li>两个垂直对称面 (σᵥ 和 σᵥ')</li>
-      </ul>
-      <p>点击"σᵥ(xz)"按钮可观察两个氢原子通过反射面交换位置的过程。</p>
-    </div>
-  </div>
+<button onclick="loadWater()">H₂O</button>
+<button onclick="selectMol('h2o2.mol', [2])">H₂O₂</button>
 
-  <!-- 页脚 -->
-  <footer>
-    <p>分子点群对称操作演示 | 基于JSmol分子可视化库 | 用于化学教育与研究</p>
-  </footer>
+<button onclick="selectMol('C2H2Cl2.mol', [2])">C₂H₂Cl₂</button>
+<button onclick="selectMol('CHCl3.mol', [3])">CHCl₃</button>
+
+<button onclick="selectMol('ClHC=C=CHCl.mol', [2])">ClHC=C=CHCl</button>
+<button onclick="selectMol('h3c-ccl3.mol', [3])">CH₃–CCl₃</button>
+
+<button onclick="selectMol('CO2.mol', [2])">CO₂</button>
+<button onclick="selectMol('BF3.mol', [3])">BF₃</button>
+
+<button onclick="selectMol('C6H6.mol', [6,3,2])">C₆H₆</button>
+<button onclick="selectMol('H2C=CH2.mol', [2])">H₂C=CH₂</button>
+
+<button onclick="selectMol('H2CCCH2.mol', [2])">H₂CCCH₂</button>
+<button onclick="selectMol('PtCl4(e2-).mol', [4,2])">PtCl₄²⁻</button>
+
+<button onclick="selectMol('SbCl5(e2-).mol', [5])">SbCl₅²⁻</button>
 </div>
+
+<!-- ================= 对称操作 ================= -->
+<div class="panel">
+<strong>可用对称操作</strong><br>
+
+<button id="btnC2" class="hidden" onclick="doCn(2)">C₂</button>
+<button id="btnC3" class="hidden" onclick="doCn(3)">C₃</button>
+<button id="btnC4" class="hidden" onclick="doCn(4)">C₄</button>
+<button id="btnC5" class="hidden" onclick="doCn(5)">C₅</button>
+<button id="btnC6" class="hidden" onclick="doCn(6)">C₆</button>
+
+<button id="btnSigma" class="hidden" onclick="sigma_v_xz()">σᵥ(xz)</button>
+<button id="btnSigmaYZ" class="hidden" onclick="sigma_v_yz()">σᵥ(yz)</button>
+</div>
+
+<div id="viewer"></div>
 
 <script>
 Jmol.setDocument(0);
@@ -531,11 +118,11 @@ color hydrogen white;
 
 /* ========= JSmol 初始化 ========= */
 var Info = {
-  width: "100%",
-  height: "100%",
+  width: 420,
+  height: 420,
   use: "HTML5",
   j2sPath: "jsmol/j2s",
-  backgroundColor: "#1a1a2e"
+  backgroundColor: "white"
 };
 
 var applet = Jmol.getApplet("myJmol", Info);
@@ -545,16 +132,9 @@ document.getElementById("viewer").innerHTML =
 /* ========= 当前 Cn ========= */
 var currentCn = [];
 
-/* ========= 更新操作提示 ========= */
-function updateOperationHint(text) {
-  document.getElementById("current-operation").textContent = text;
-}
-
 /* ========= 加载水 ========= */
 function loadWater() {
   currentCn = [2];
-  
-  updateOperationHint("已加载水分子(H₂O)，点群: C₂v");
 
   Jmol.script(applet, `
     ${waterBaseModel}
@@ -571,9 +151,6 @@ function loadWater() {
 /* ========= 加载其它分子 ========= */
 function selectMol(file, cnList) {
   currentCn = cnList;
-  
-  var molName = event.target.textContent.trim();
-  updateOperationHint("已加载分子: " + molName);
 
   Jmol.script(applet, `
     load ${file}
@@ -589,17 +166,15 @@ function selectMol(file, cnList) {
 
 /* ========= 更新按钮 ========= */
 function updateButtons(isWater) {
-  // 隐藏所有操作按钮
+
   [2,3,4,5,6].forEach(n => {
     document.getElementById("btnC"+n).classList.add("hidden");
   });
 
-  // 显示当前分子可用的Cn操作按钮
   currentCn.forEach(n => {
     document.getElementById("btnC"+n).classList.remove("hidden");
   });
 
-  // σᵥ操作仅对水分子可用
   document.getElementById("btnSigma")
     .classList.toggle("hidden", !isWater);
 
@@ -607,21 +182,17 @@ function updateButtons(isWater) {
     .classList.toggle("hidden", !isWater);
 }
 
-/* ========= Cn 旋转操作 ========= */
+/* ========= Cn ========= */
 function doCn(n) {
   var angle = 360 / n;
-  updateOperationHint("正在执行 Cₙ 旋转操作 (n=" + n + ")，旋转角度: " + angle + "°");
-  
   Jmol.script(applet, `
     spin $pgva_0_c${n}_1 ${angle} 60
   `);
 }
 
-/* ========= σᵥ(xz)：H ↔ H 交换 ========= */
+/* ========= σᵥ(xz)：H ↔ H ========= */
 function sigma_v_xz() {
-  updateOperationHint("正在执行 σᵥ(xz) 反射操作: 两个氢原子交换位置");
-  
-  // 重新加载水分子确保初始位置
+
   Jmol.script(applet, waterBaseModel);
 
   var y0 = 0.757;
@@ -630,7 +201,6 @@ function sigma_v_xz() {
 
   var script = "";
 
-  // 创建动画序列：两个氢原子沿y轴反向移动
   for (var i = 0; i < steps; i++) {
     script += `
       select atomno=2;
@@ -641,28 +211,19 @@ function sigma_v_xz() {
     `;
   }
 
-  // 播放动画
   Jmol.script(applet, script);
 }
 
 /* ========= σᵥ(yz)：恒等操作 ========= */
 function sigma_v_yz() {
-  updateOperationHint("σᵥ(yz) 反射操作: 分子保持不变 (恒等操作)");
-  
-  // 显示信息对话框
-  Jmol.script(applet, `
-    alert("σᵥ(yz) 是 H₂O 的分子平面。\\n\\n" +
-          "所有原子都位于 x = 0，\\n" +
-          "反射后与原构型完全相同，\\n" +
-          "因此分子保持不变（等价于恒等操作 E）。")
-  `);
+  alert(
+    "σᵥ(yz) 是 H₂O 的分子平面。\n\n" +
+    "所有原子都位于 x = 0，\n" +
+    "反射后与原构型完全相同，\n" +
+    "因此分子保持不变（等价于恒等操作 E）。"
+  );
 }
-
-// 页面加载完成后默认加载水分子
-window.addEventListener('DOMContentLoaded', function() {
-  // 延迟加载以确保JSmol完全初始化
-  setTimeout(loadWater, 500);
-});
 </script>
+
 </body>
 </html>
