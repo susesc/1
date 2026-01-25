@@ -2,155 +2,514 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>JSmol 分子点群 + H₂O σᵥ(xz)</title>
-
+<title>分子点群与对称操作交互演示（带视角保持）</title>
 <script src="jsmol/JSmol.min.js"></script>
-
 <style>
 body {
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f6f7f9;
-  text-align: center;
+  margin: 0;
+  font-family: "Inter","Segoe UI",Arial,Helvetica,sans-serif;
+  background: #f3f4f6;
+  color: #374151;
+  overflow: hidden;
 }
-
-.panel {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 10px auto;
-  width: 90%;
-  max-width: 900px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+.header {
+  background: linear-gradient(90deg,#991b1b,#b91c1c);
+  color: white;
+  padding: 14px 22px;
+  font-size: 20px;
+  font-weight: 600;
+  height: 60px;
+  box-sizing: border-box;
 }
-
-button {
-  margin: 4px;
-  padding: 6px 14px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  background: #fdfdfd;
+.main {
+  display: flex;
+  height: calc(100vh - 60px);
+  box-sizing: border-box;
+  gap: 14px;
+  padding: 14px;
 }
-
-button:hover {
-  background: #e9eef5;
+.viewer-panel {
+  flex: 1;
+  background: white;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* 防止内容溢出 */
 }
-
 #viewer {
-  width: 420px;
-  height: 420px;
-  margin: 15px auto;
-  border: 1px solid #bbb;
+  flex: 1;
+  width: 100%;
+  min-height: 0; /* 允许flex子项缩小 */
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
   background: white;
 }
-
-.hidden {
-  display: none;
+.pg-info {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(180deg,#fafafa,#f3f4f6);
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+.pg-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #111827;
+}
+.pg-text {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #4b5563;
+}
+.control-panel {
+  width: 380px;
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.section {
+  margin-bottom: 18px;
+}
+.section-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+  border-left: 4px solid #b91c1c;
+  padding-left: 8px;
+}
+button {
+  margin: 4px;
+  padding: 7px 16px;
+  font-size: 14px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: linear-gradient(180deg,#fff,#f3f4f6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+button:hover {
+  background: linear-gradient(180deg,#fee2e2,#fecaca);
+  border-color: #ef4444;
+  color: #7f1d1d;
+  transform: translateY(-1px);
+}
+button.active {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+button.pg-btn {
+  background: linear-gradient(180deg,#f0f9ff,#e0f2fe);
+  border-color: #38bdf8;
+  color: #0369a1;
+}
+button.pg-btn:hover {
+  background: linear-gradient(180deg,#e0f2fe,#bae6fd);
+  border-color: #0ea5e9;
+  color: #075985;
+}
+button.pg-btn.active {
+  background: linear-gradient(180deg,#bae6fd,#7dd3fc);
+  border-color: #0ea5e9;
+  color: #0c4a6e;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.hidden { display: none; }
+.note {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+.status-indicator {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 12px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.status-indicator::before {
+  content: "ℹ️";
+}
+.loading {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+.loading::before {
+  content: "⏳";
+}
+.special-btn {
+  background: linear-gradient(180deg,#fef3c7,#fde68a);
+  border-color: #f59e0b;
+  color: #92400e;
+}
+.special-btn:hover {
+  background: linear-gradient(180deg,#fde68a,#fcd34d);
+  border-color: #f59e0b;
+  color: #92400e;
+}
+.identity-btn {
+  background: linear-gradient(180deg,#d1fae5,#a7f3d0);
+  border-color: #10b981;
+  color: #065f46;
+}
+.identity-btn:hover {
+  background: linear-gradient(180deg,#a7f3d0,#6ee7b7);
+  border-color: #10b981;
+  color: #065f46;
+}
+.inversion-btn {
+  background: linear-gradient(180deg,#e0e7ff,#c7d2fe);
+  border-color: #6366f1;
+  color: #3730a3;
+}
+.inversion-btn:hover {
+  background: linear-gradient(180deg,#c7d2fe,#a5b4fc);
+  border-color: #6366f1;
+  color: #3730a3;
+}
+.chcl3-btn {
+  background: linear-gradient(180deg,#f3e8ff,#e9d5ff);
+  border-color: #a855f7;
+  color: #6b21a8;
+}
+.chcl3-btn:hover {
+  background: linear-gradient(180deg,#e9d5ff,#d8b4fe);
+  border-color: #a855f7;
+  color: #6b21a8;
+}
+.molecule-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
 }
 </style>
 </head>
-
 <body>
-
-<h2>分子点群 Cₙ 操作演示（含 H₂O σᵥ(xz)）</h2>
-
-<!-- ================= 分子选择 ================= -->
-<div class="panel">
-<strong>选择分子</strong><br>
-
-<button onclick="loadWater()">H₂O</button>
-<button onclick="selectMol('h2o2.mol', [2])">H₂O₂</button>
-
-<button onclick="selectMol('C2H2Cl2.mol', [2])">C₂H₂Cl₂</button>
-<button onclick="selectMol('CHCl3.mol', [3])">CHCl₃</button>
-
-<button onclick="selectMol('ClHC=C=CHCl.mol', [2])">ClHC=C=CHCl</button>
-<button onclick="selectMol('h3c-ccl3.mol', [3])">CH₃–CCl₃</button>
-
-<button onclick="selectMol('CO2.mol', [2])">CO₂</button>
-<button onclick="selectMol('BF3.mol', [3])">BF₃</button>
-
-<button onclick="selectMol('C6H6.mol', [6,3,2])">C₆H₆</button>
-<button onclick="selectMol('H2C=CH2.mol', [2])">H₂C=CH₂</button>
-
-<button onclick="selectMol('H2CCCH2.mol', [2])">H₂CCCH₂</button>
-<button onclick="selectMol('PtCl4(e2-).mol', [4,2])">PtCl₄²⁻</button>
-
-<button onclick="selectMol('SbCl5(e2-).mol', [5])">SbCl₅²⁻</button>
+<div class="header">
+  分子点群与对称操作交互演示（所有动画均支持视角保持）
 </div>
+<div class="main">
+  <div class="viewer-panel">
+    <div id="viewer"></div>
+    <div id="pgInfo" class="pg-info">
+      <div class="pg-title">点群说明</div>
+      <div class="pg-text">
+        请选择一个分子以查看其点群与对称元素说明。
+      </div>
+    </div>
+  </div>
 
-<!-- ================= 对称操作 ================= -->
-<div class="panel">
-<strong>可用对称操作</strong><br>
+  <div class="control-panel">
+    <div class="section">
+      <div class="section-title">选择点群类型</div>
+      <button class="pg-btn active" onclick="selectPointGroup('all')">全部分子</button>
+      <button class="pg-btn" onclick="selectPointGroup('C2v')">C₂ᵥ 点群</button>
+      <button class="pg-btn" onclick="selectPointGroup('C3v')">C₃ᵥ 点群</button>
+      <button class="pg-btn" onclick="selectPointGroup('C2')">C₂ 点群</button>
+      <button class="pg-btn" onclick="selectPointGroup('C2h')">C₂ʰ 点群</button>
+      <button class="pg-btn" onclick="selectPointGroup('D∞h')">D∞ʰ 点群</button>
+      <button class="pg-btn" onclick="selectPointGroup('D3h')">D₃ʰ 点群</button>
+      <button class="pg-btn" onclick="selectPointGroup('D6h')">D₆ʰ 点群</button>
+      <button class="pg-btn" onclick="selectPointGroup('D2h')">D₂ʰ 点群</button>
+      <button class="pg-btn" onclick="selectPointGroup('D4h')">D₄ʰ 点群</button>
+      <div class="status-indicator" id="pg-status">当前显示: 全部分子</div>
+    </div>
 
-<button id="btnC2" class="hidden" onclick="doCn(2)">C₂</button>
-<button id="btnC3" class="hidden" onclick="doCn(3)">C₃</button>
-<button id="btnC4" class="hidden" onclick="doCn(4)">C₄</button>
-<button id="btnC5" class="hidden" onclick="doCn(5)">C₅</button>
-<button id="btnC6" class="hidden" onclick="doCn(6)">C₆</button>
+    <div class="section">
+      <div class="section-title">选择分子</div>
+      <div id="molecule-buttons-container" class="molecule-buttons-container">
+        <!-- 分子按钮将通过JavaScript动态生成 -->
+      </div>
+      <div class="status-indicator" id="mol-status">已加载: H₂O (水分子)</div>
+    </div>
 
-<button id="btnSigma" class="hidden" onclick="sigma_v_xz()">σᵥ(xz)</button>
+    <div class="section" id="h2oSpecialSection">
+      <div class="section-title">H₂O 特殊动画（支持视角保持）</div>
+      <button id="btnSigmaV" class="special-btn" onclick="playSigmaVxz()">播放 σᵥ(xz) 连续反射</button>
+      <button id="btnSigmaPrimeV" class="identity-btn" onclick="playSigmaPrimeVyz()">播放 σᵥ′(yz) 反射</button>
+      <div class="note">先用鼠标旋转到想要的角度，再点击按钮进行反射动画</div>
+    </div>
+
+    <div class="section" id="c2h2cl2SpecialSection">
+      <div class="section-title">C₂H₂Cl₂ 反演对称动画（支持视角保持）</div>
+      <button id="btnC2H2Cl2Inversion" class="inversion-btn" onclick="playC2H2Cl2Inversion()">播放反演操作 i</button>
+      <div class="note">先用鼠标旋转到想要的角度，再点击按钮进行反演动画</div>
+    </div>
+
+    <div class="section" id="chcl3SpecialSection">
+      <div class="section-title">CHCl₃ σᵥ 反射动画（支持视角保持）</div>
+      <button id="btnSigmaV12" class="chcl3-btn" onclick="playCHCl3SigmaV12()">σᵥ₁（Cl1 ↔ Cl2）</button>
+      <button id="btnSigmaV23" class="chcl3-btn" onclick="playCHCl3SigmaV23()">σᵥ₂（Cl2 ↔ Cl3）</button>
+      <button id="btnSigmaV31" class="chcl3-btn" onclick="playCHCl3SigmaV31()">σᵥ₃（Cl3 ↔ Cl1）</button>
+      <div class="note">先用鼠标旋转到想要的角度，再点击按钮进行σᵥ反射</div>
+    </div>
+
+    <div class="section" id="co2SpecialSection">
+      <div class="section-title">CO₂ 特殊动画（支持视角保持）</div>
+      <button id="btnInversion" class="special-btn" onclick="playInversion()">播放反演操作 i</button>
+      <div class="note">先用鼠标旋转到想要的角度，再点击按钮进行反演动画</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">可用 Cₙ 旋转操作</div>
+      <button id="btnC2" class="hidden" onclick="doCnWithReset(2)">C₂</button>
+      <button id="btnC3" class="hidden" onclick="doCnWithReset(3)">C₃</button>
+      <button id="btnC4" class="hidden" onclick="doCnWithReset(4)">C₄</button>
+      <button id="btnC5" class="hidden" onclick="doCnWithReset(5)">C₅</button>
+      <button id="btnC6" class="hidden" onclick="doCnWithReset(6)">C₆</button>
+      <div class="status-indicator" id="op-status">可用操作: C₂</div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">视图控制</div>
+      <button onclick="resetView()">重置视图</button>
+      <button onclick="Jmol.script(myJmol, 'spin on;')">自动旋转</button>
+      <button onclick="Jmol.script(myJmol, 'spin off;')">停止旋转</button>
+      <div class="note">重置视图可以恢复分子的原始状态</div>
+    </div>
+  </div>
 </div>
-
-<div id="viewer"></div>
 
 <script>
 Jmol.setDocument(0);
+// 更新Info对象的宽度和高度为自适应
+var Info = {
+  width: "100%",
+  height: "100%",
+  use: "HTML5",
+  j2sPath: "jsmol/j2s",
+  script: "set antialiasDisplay; set zoomLarge false; background white;"
+};
+var myJmol = Jmol.getApplet("myJmol", Info);
+document.getElementById("viewer").innerHTML = Jmol.getAppletHtml(myJmol);
 
-/* ========= H₂O 基准模型 ========= */
-var waterBaseModel = `
-load data "model xyz"
+// 分子数据数组
+var molecules = [
+  {file: "water.xyz", displayName: "H₂O", pointGroup: "C2v", cnList: [2]},
+  {file: "C2H2Cl2.mol", displayName: "C₂H₂Cl₂", pointGroup: "C2v", cnList: [2]},
+  {file: "h2o2.mol", displayName: "H₂O₂", pointGroup: "C2", cnList: [2]},
+  {file: "CHCl3.mol", displayName: "CHCl₃", pointGroup: "C3v", cnList: [3]},
+  {file: "h3c-ccl3.mol", displayName: "CH₃–CCl₃", pointGroup: "C3v", cnList: [3]},
+  {file: "ClHC=C=CHCl.mol", displayName: "ClHC=C=CHCl", pointGroup: "C2h", cnList: [2]},
+  {file: "CO2.mol", displayName: "CO₂", pointGroup: "D∞h", cnList: [2]},
+  {file: "BF3.mol", displayName: "BF₃", pointGroup: "D3h", cnList: [3]},
+  {file: "SbCl5(e2-).mol", displayName: "SbCl₅²⁻", pointGroup: "D3h", cnList: [5]},
+  {file: "C6H6.mol", displayName: "C₆H₆", pointGroup: "D6h", cnList: [6,3,2]},
+  {file: "H2C=CH2.mol", displayName: "H₂C=CH₂", pointGroup: "D2h", cnList: [2]},
+  {file: "H2CCCH2.mol", displayName: "H₂CCCH₂", pointGroup: "D2h", cnList: [2]},
+  {file: "PtCl4(e2-).mol", displayName: "PtCl₄²⁻", pointGroup: "D4h", cnList: [4,2]}
+];
+
+var pointGroupText = {
+  "water.xyz":       { name:"C₂ᵥ", text:"水分子属于 C₂ᵥ 点群，具有一个 C₂ 主轴和两个垂直镜面 σᵥ。" },
+  "h2o2.mol":        { name:"C₂",  text:"过氧化氢为非平面构型，属于 C₂ 点群，仅包含一个 C₂ 旋转轴。" },
+  "C2H2Cl2.mol":     { name:"C₂ᵥ", text:"1,2-二氯乙烯（顺式）属于 C₂ᵥ 点群，具有 C₂ 轴与两个镜面。" },
+  "CHCl3.mol":       { name:"C₃ᵥ", text:"氯仿属于 C₃ᵥ 点群，具有一个 C₃ 主轴和三个 σᵥ 镜面。" },
+  "ClHC=C=CHCl.mol": { name:"C₂ʰ", text:"ClHC=C=CHCl 为平面分子，具有 C₂ 轴与反演中心，属于 C₂ʰ 点群。" },
+  "h3c-ccl3.mol":    { name:"C₃ᵥ", text:"CH₃–CCl₃ 近似属于 C₃ᵥ 点群，具有一条 C₃ 主轴和 σᵥ 镜面。" },
+  "CO2.mol":         { name:"D∞ʰ", text:"CO₂ 为线性分子，具有反演中心 i、无穷多个 C₂ 轴及 σₕ、σᵥ。" },
+  "BF3.mol":         { name:"D₃ʰ", text:"BF₃ 为平面三角结构，属于 D₃ʰ 点群，具有 C₃ 主轴与 σₕ。" },
+  "C6H6.mol":        { name:"D₆ʰ", text:"苯分子属于 D₆ʰ 点群，具有 C₆ 主轴、多个 C₂ 轴、σₕ、σᵥ 及反演中心。" },
+  "H2C=CH2.mol":     { name:"D₂ʰ", text:"乙烯为平面分子，具有三个互相垂直的 C₂ 轴和反演中心。" },
+  "H2CCCH2.mol":     { name:"D₂ʰ", text:"丁二烯平面构型属于 D₂ʰ 点群，具有 C₂ 轴、σₕ 与反演中心。" },
+  "PtCl4(e2-).mol":  { name:"D₄ʰ", text:"平方平面 PtCl₄²⁻ 属于 D₄ʰ 点群，具有 C₄ 主轴与 σₕ。" },
+  "SbCl5(e2-).mol":  { name:"D₃ʰ", text:"SbCl₅²⁻ 为三角双锥构型，属于 D₃ʰ 点群。" }
+};
+
+// CO₂基准模型
+const co2BaseModel = `
+load data "model mol"
+CO2
+  OpenAI
+
+  3  2  0  0  0  0  0  0  0999 V2000
+   -1.1970    0.0000    0.0000 O
+    1.1970    0.0000    0.0000 O
+    0.0000    0.0000    0.0000 C
+  1  3  2  0
+  2  3  2  0
+M  END
+end "model mol"
+
+set antialiasDisplay;
+set zoomLarge false;
+spacefill 22%;
+wireframe 0.15;
+color oxygen red;
+color carbon gray;
+label %e;
+center;
+zoom 120;
+`;
+
+// H₂O基准模型
+const h2oBaseModel = `
+load data "h2o xyz"
 3
-H2O
-O  0.000  0.000  0.000
-H  0.000  0.757  0.586
-H  0.000 -0.757  0.586
-end "model xyz"
-
+H₂O
+O  0.000   0.000   0.000
+H  0.000   0.757   0.586
+H  0.000  -0.757   0.586
+end "h2o xyz"
+set zoomlarge false;
 set antialiasDisplay;
 spacefill 23%;
 wireframe 0.15;
 color oxygen red;
 color hydrogen white;
+label %e;
+center;
+zoom 120;
 `;
 
-/* ========= JSmol 初始化 ========= */
-var Info = {
-  width: 420,
-  height: 420,
-  use: "HTML5",
-  j2sPath: "jsmol/j2s",
-  backgroundColor: "white"
-};
+// C₂H₂Cl₂基准模型
+const c2h2cl2BaseModel = `
+load data "model xyz"
+6
+C2H2Cl2
+Cl   2.1437   0.1015  -0.0002
+Cl  -2.1439  -0.1011  -0.0002
+C    0.5135  -0.4232   0.0002
+C   -0.5132   0.4227   0.0002
+H    0.4242  -1.5014   0.0001
+H   -0.4237   1.5009   0.0001
+end "model xyz"
 
-var applet = Jmol.getApplet("myJmol", Info);
-document.getElementById("viewer").innerHTML =
-  Jmol.getAppletHtml(applet);
+set zoomlarge false;
+set antialiasDisplay;
+spacefill 23%;
+wireframe 0.15;
+color chlorine green;
+color carbon gray;
+color hydrogen white;
+label %e;
+center;
+zoom 120;
+`;
 
-/* ========= 当前 Cn ========= */
+// CHCl₃基准模型
+const chcl3BaseModel = `
+load data "model xyz"
+5
+CHCl3
+Cl  -0.0962  -1.6789   0.1394
+Cl  -1.4059   0.9228   0.1394
+Cl   1.5022   0.7561   0.1393
+C   -0.0001   0.0000  -0.4181
+H   -0.0001  -0.0001  -1.5111
+end "model xyz"
+
+set zoomlarge false;
+set antialiasDisplay;
+spacefill 23%;
+wireframe 0.15;
+color chlorine green;
+color carbon gray;
+color hydrogen white;
+center;
+zoom 120;
+`;
+
 var currentCn = [];
+var currentFile = null;
+var currentDisplayName = "";
+var isAnimating = false;
+var currentPointGroup = "all";
 
-/* ========= 加载水 ========= */
-function loadWater() {
-  currentCn = [2];
-
-  Jmol.script(applet, `
-    ${waterBaseModel}
-    center
-    zoom 140
-    calculate pointgroup
-    draw pointgroup
-  `);
-
-  updateButtons(true);
+// 初始化分子按钮
+function initMoleculeButtons() {
+  // 默认显示所有分子
+  updateMoleculeButtons("all");
 }
 
-/* ========= 加载其它分子 ========= */
-function selectMol(file, cnList) {
-  currentCn = cnList;
+// 更新分子按钮显示
+function updateMoleculeButtons(pointGroup) {
+  currentPointGroup = pointGroup;
+  const container = document.getElementById("molecule-buttons-container");
+  container.innerHTML = "";
+  
+  // 更新点群按钮状态
+  document.querySelectorAll(".pg-btn").forEach(btn => {
+    btn.classList.remove("active");
+  });
+  document.querySelector(`button[onclick="selectPointGroup('${pointGroup}')"]`).classList.add("active");
+  
+  // 更新状态显示
+  const pgStatus = document.getElementById("pg-status");
+  if (pointGroup === "all") {
+    pgStatus.textContent = "当前显示: 全部分子";
+  } else {
+    pgStatus.textContent = `当前显示: ${pointGroup} 点群`;
+  }
+  
+  // 筛选分子
+  const filteredMolecules = molecules.filter(mol => {
+    if (pointGroup === "all") return true;
+    return mol.pointGroup === pointGroup;
+  });
+  
+  // 创建分子按钮
+  filteredMolecules.forEach(mol => {
+    const button = document.createElement("button");
+    button.textContent = mol.displayName;
+    button.onclick = () => selectMol(mol.file, mol.cnList, mol.displayName);
+    container.appendChild(button);
+  });
+  
+  // 如果没有分子，显示提示
+  if (filteredMolecules.length === 0) {
+    const noMolecules = document.createElement("div");
+    noMolecules.className = "note";
+    noMolecules.textContent = "该点群下暂无分子";
+    container.appendChild(noMolecules);
+  }
+}
 
-  Jmol.script(applet, `
+// 选择点群
+function selectPointGroup(pointGroup) {
+  if (isAnimating) return;
+  updateMoleculeButtons(pointGroup);
+}
+
+// 选择分子
+function selectMol(file, cnList, displayName) {
+  if (isAnimating) return;
+  
+  currentFile = file;
+  currentCn = cnList;
+  currentDisplayName = displayName;
+  
+  // 重置加载分子
+  resetAndLoadMol(file, displayName);
+}
+
+function resetAndLoadMol(file, displayName) {
+  isAnimating = true;
+  
+  // 更新状态为加载中
+  const statusEl = document.getElementById('mol-status');
+  statusEl.textContent = `正在加载: ${displayName}...`;
+  statusEl.classList.add('loading');
+  
+  Jmol.script(myJmol, `
     load ${file}
     center
     zoom 120
@@ -159,56 +518,565 @@ function selectMol(file, cnList) {
     draw pointgroup
   `);
 
-  updateButtons(false);
+  updateButtons();
+  updatePointGroupInfo(file, displayName || file.split('.')[0]);
+  updateSpecialSectionVisibility();
+  
+  // 延迟更新状态，确保加载完成
+  setTimeout(() => {
+    statusEl.textContent = `已加载: ${displayName}`;
+    statusEl.classList.remove('loading');
+    
+    if (currentCn.length > 0) {
+      document.getElementById('op-status').textContent = `可用操作: ${currentCn.map(n => 'C' + n).join(', ')}`;
+    } else {
+      document.getElementById('op-status').textContent = '此分子无可用的Cₙ对称操作';
+    }
+    
+    isAnimating = false;
+  }, 800);
 }
 
-/* ========= 按钮更新 ========= */
-function updateButtons(isWater) {
-
+function updateButtons() {
   [2,3,4,5,6].forEach(n => {
-    document.getElementById("btnC"+n).classList.add("hidden");
+    const btn = document.getElementById("btnC"+n);
+    if (btn) btn.classList.add("hidden");
   });
-
   currentCn.forEach(n => {
-    document.getElementById("btnC"+n).classList.remove("hidden");
+    const btn = document.getElementById("btnC"+n);
+    if (btn) btn.classList.remove("hidden");
   });
-
-  document.getElementById("btnSigma")
-    .classList.toggle("hidden", !isWater);
 }
 
-/* ========= Cn ========= */
-function doCn(n) {
-  var angle = 360 / n;
-  Jmol.script(applet, `
-    spin $pgva_0_c${n}_1 ${angle} 60
+function updatePointGroupInfo(file, name) {
+  const t = document.querySelector(".pg-title");
+  const c = document.querySelector(".pg-text");
+  if (pointGroupText[file]) {
+    t.innerHTML = `点群说明（${pointGroupText[file].name}）`;
+    c.innerHTML = pointGroupText[file].text;
+  } else {
+    t.innerHTML = "点群说明";
+    c.innerHTML = "暂无该分子的点群说明。";
+  }
+}
+
+function updateSpecialSectionVisibility() {
+  const h2oSection = document.getElementById("h2oSpecialSection");
+  const c2h2cl2Section = document.getElementById("c2h2cl2SpecialSection");
+  const chcl3Section = document.getElementById("chcl3SpecialSection");
+  const co2Section = document.getElementById("co2SpecialSection");
+  
+  // 重置所有部分为隐藏
+  h2oSection.classList.add("hidden");
+  c2h2cl2Section.classList.add("hidden");
+  chcl3Section.classList.add("hidden");
+  co2Section.classList.add("hidden");
+  
+  // 根据当前分子显示相应的部分
+  if (currentFile === 'water.xyz') {
+    h2oSection.classList.remove("hidden");
+  } else if (currentFile === 'C2H2Cl2.mol') {
+    c2h2cl2Section.classList.remove("hidden");
+  } else if (currentFile === 'CHCl3.mol') {
+    chcl3Section.classList.remove("hidden");
+  } else if (currentFile === 'CO2.mol') {
+    co2Section.classList.remove("hidden");
+  }
+}
+
+// 通用函数：保存当前视角并重置模型
+function saveViewAndReset(baseModel) {
+  // 保存当前视角
+  Jmol.script(myJmol, "save orientation myView;");
+  // 重置模型但立即恢复视角
+  Jmol.script(myJmol, baseModel + "restore orientation myView;");
+}
+
+// Cn旋转函数：先重置视图再旋转
+function doCnWithReset(n) {
+  if (isAnimating) return;
+
+  isAnimating = true;
+
+  const opStatus = document.getElementById('op-status');
+  opStatus.textContent = `正在准备 C${n} 旋转...`;
+  opStatus.classList.add('loading');
+
+  // ✅【新增】保存当前用户视角
+  Jmol.script(myJmol, "save orientation userView;");
+
+  Jmol.script(myJmol, `
+    load ${currentFile}
+    center
+    zoom 120
+    spin off
+    calculate pointgroup
+    draw pointgroup
+
+    // ✅【新增】立刻恢复刚才的视角
+    restore orientation userView;
   `);
+
+  setTimeout(() => {
+    const angle = 360 / n;
+
+    // 🔵 这一行完全不动（你原来就是对的）
+    Jmol.script(myJmol, `spin $pgva_0_c${n}_1 ${angle} 60`);
+
+    opStatus.textContent = `正在执行 C${n} 旋转，角度: ${angle}°`;
+
+    setTimeout(() => {
+      isAnimating = false;
+      opStatus.classList.remove('loading');
+      opStatus.textContent =
+        `可用操作: ${currentCn.map(n => 'C' + n).join(', ')}`;
+    }, 2000);
+
+  }, 400);
 }
 
-/* ========= σᵥ(xz)：仅 H₂O ========= */
-function sigma_v_xz() {
 
-  Jmol.script(applet, waterBaseModel);
+// H₂O的σᵥ(xz)反射动画（带视角保持）
+function playSigmaVxz() {
+  if (currentFile !== 'water.xyz' || isAnimating) return;
 
-  var y0 = 0.757;
-  var steps = 40;
-  var dy = (-2 * y0) / steps;
+  isAnimating = true;
+  const btn = document.getElementById("btnSigmaV");
+  btn.disabled = true;
+  btn.classList.add("active");
+  btn.textContent = "动画播放中...";
+  
+  document.getElementById('op-status').textContent = "正在播放 σᵥ(xz) 反射动画...";
+  document.getElementById('op-status').classList.add('loading');
 
-  var script = "";
+  // 保存当前视角并重置模型
+  saveViewAndReset(h2oBaseModel);
+  
+  let script = "set echo off; delay 0.4;";
 
-  for (var i = 0; i < steps; i++) {
+  const steps = 36;
+  const totalAnimationSeconds = 2.0;
+  const delayPerStep = totalAnimationSeconds / steps;
+  const y0 = 0.757;
+  const dy = (-2 * y0) / steps;
+
+  for (let i = 0; i < steps; i++) {
     script += `
-      select atomno=2;
-      translateSelected {0 ${dy.toFixed(4)} 0};
-      select atomno=3;
-      translateSelected {0 ${(-dy).toFixed(4)} 0};
-      delay 0.05;
+      select atomno=2; translateSelected {0 ${dy.toFixed(6)} 0};
+      select atomno=3; translateSelected {0 ${(-dy).toFixed(6)} 0};
+      delay ${delayPerStep.toFixed(3)};
     `;
   }
 
-  Jmol.script(applet, script);
-}
-</script>
+  // 动画完成后，重新计算点群并重新绘制
+  script += `
+    delay 0.5;
+    calculate pointgroup;
+    draw pointgroup;
+    spin off;
+    background echo "σᵥ(xz) 反射动画完成";
+    delay 0.8;
+    background echo OFF;
+  `;
 
+  Jmol.script(myJmol, script);
+
+  setTimeout(() => {
+    isAnimating = false;
+    btn.disabled = false;
+    btn.classList.remove("active");
+    btn.textContent = "播放 σᵥ(xz) 连续反射";
+    
+    // 更新状态
+    document.getElementById('op-status').classList.remove('loading');
+    document.getElementById('op-status').textContent = "σᵥ(xz) 动画完成，C₂ 操作已恢复";
+    
+    // 延迟后恢复状态显示
+    setTimeout(() => {
+      document.getElementById('op-status').textContent = "可用操作: C₂";
+    }, 1500);
+  }, (totalAnimationSeconds + 1.8) * 1000);
+}
+
+// H₂O的σᵥ′(yz)反射操作 - 恒等操作（带视角保持）
+function playSigmaPrimeVyz() {
+  if (currentFile !== 'water.xyz' || isAnimating) return;
+  
+  isAnimating = true;
+  const btn = document.getElementById("btnSigmaPrimeV");
+  btn.disabled = true;
+  btn.classList.add("active");
+  btn.textContent = "执行恒等操作...";
+  
+  document.getElementById('op-status').textContent = "正在执行 σᵥ′(yz) 反射操作...";
+  document.getElementById('op-status').classList.add('loading');
+
+  // 保存当前视角并重置模型
+  saveViewAndReset(h2oBaseModel);
+  
+  // 短暂延迟后显示醒目的提示信息
+  setTimeout(() => {
+    // 显示醒目的大字提示
+    Jmol.script(myJmol, `
+      background echo "<font size='+4' color='#dc2626'><b>σᵥ′(yz) 平面反射</b></font>";
+      delay 1.0;
+      background echo "<font size='+3' color='#dc2626'><b>该平面是水分子的分子平面</b></font>";
+      delay 1.0;
+      background echo "<font size='+3' color='#dc2626'><b>所有原子都位于 yz 平面内</b></font>";
+      delay 1.2;
+      background echo "<font size='+4' color='#059669'><b>重要结论：</b></font>";
+      delay 0.8;
+      background echo "<font size='+4' color='#059669'><b>所有原子都映射回自身</b></font>";
+      delay 0.8;
+      background echo "<font size='+4' color='#059669'><b>因此分子结构完全不变</b></font>";
+      delay 2.0;
+      background echo OFF;
+    `);
+    
+    // 同时在状态栏显示重要信息
+    document.getElementById('op-status').classList.remove('loading');
+    document.getElementById('op-status').innerHTML = `
+      <strong style="color:#dc2626;font-size:14px;">σᵥ′(yz) 反射：恒等操作</strong>
+      <br>
+      <span style="color:#059669;">所有原子映射回自身 → 分子结构不变</span>
+    `;
+    
+    // 恢复按钮状态
+    setTimeout(() => {
+      isAnimating = false;
+      btn.disabled = false;
+      btn.classList.remove("active");
+      btn.textContent = "播放 σᵥ′(yz) 反射";
+      
+      // 延迟后恢复状态显示
+      setTimeout(() => {
+        document.getElementById('op-status').textContent = "可用操作: C₂";
+      }, 3000);
+    }, 7000);
+  }, 500);
+}
+
+// C₂H₂Cl₂的反演操作i动画（带视角保持）
+function playC2H2Cl2Inversion() {
+  if (currentFile !== 'C2H2Cl2.mol' || isAnimating) return;
+
+  isAnimating = true;
+  const btn = document.getElementById("btnC2H2Cl2Inversion");
+  btn.disabled = true;
+  btn.classList.add("active");
+  btn.textContent = "动画播放中...";
+  
+  document.getElementById('op-status').textContent = "正在播放 C₂H₂Cl₂ 反演操作 i...";
+  document.getElementById('op-status').classList.add('loading');
+
+  // 保存当前视角并重置模型
+  saveViewAndReset(c2h2cl2BaseModel);
+  
+  // 原子数据
+  const atoms = [
+    {id:1, x: 2.1437,  y: 0.1015,  z:-0.0002},
+    {id:2, x:-2.1439,  y:-0.1011, z:-0.0002},
+    {id:3, x: 0.5135,  y:-0.4232, z: 0.0002},
+    {id:4, x:-0.5132,  y: 0.4227, z: 0.0002},
+    {id:5, x: 0.4242,  y:-1.5014, z: 0.0001},
+    {id:6, x:-0.4237,  y: 1.5009, z: 0.0001}
+  ];
+
+  const steps = 50;
+  let script = "set echo off; delay 0.4;";
+  
+  // 构建动画脚本（逐步移动每个原子到其反演位置）
+  for (let i = 0; i < steps; i++) {
+    atoms.forEach(a => {
+      script +=
+        "select atomno=" + a.id + ";" +
+        "translateSelected {" +
+        (-2*a.x/steps).toFixed(4) + " " +
+        (-2*a.y/steps).toFixed(4) + " " +
+        (-2*a.z/steps).toFixed(4) +
+        "};";
+    });
+    script += "delay 0.04;";
+  }
+  
+  // 动画完成后，重新计算点群
+  script += `
+    delay 0.5;
+    calculate pointgroup;
+    draw pointgroup;
+    spin off;
+    background echo "C₂H₂Cl₂ 反演操作 i 动画完成";
+    delay 0.8;
+    background echo OFF;
+  `;
+
+  Jmol.script(myJmol, script);
+
+  setTimeout(() => {
+    isAnimating = false;
+    btn.disabled = false;
+    btn.classList.remove("active");
+    btn.textContent = "播放反演操作 i";
+    
+    // 更新状态
+    document.getElementById('op-status').classList.remove('loading');
+    document.getElementById('op-status').textContent = "C₂H₂Cl₂ 反演操作 i 动画完成";
+    
+    // 延迟后恢复状态显示
+    setTimeout(() => {
+      document.getElementById('op-status').textContent = "可用操作: C₂";
+    }, 1500);
+  }, (steps * 0.04 + 1.8) * 1000);
+}
+
+// CHCl₃ σᵥ反射动画 - 通用交换函数（保持视角）
+function swapClKeepView(idA, idB, atomA, atomB) {
+  // 保存当前视角并重置模型
+  saveViewAndReset(chcl3BaseModel);
+  
+  const steps = 40;
+  const dxA = (atomB.x - atomA.x) / steps;
+  const dyA = (atomB.y - atomA.y) / steps;
+  const dzA = (atomB.z - atomA.z) / steps;
+  
+  const dxB = (atomA.x - atomB.x) / steps;
+  const dyB = (atomA.y - atomB.y) / steps;
+  const dzB = (atomA.z - atomB.z) / steps;
+  
+  let script = "set echo off;";
+  
+  for (let i = 0; i < steps; i++) {
+    script +=
+      "select atomno=" + idA + ";" +
+      "translateSelected {" +
+      dxA.toFixed(4) + " " +
+      dyA.toFixed(4) + " " +
+      dzA.toFixed(4) + "};" +
+      
+      "select atomno=" + idB + ";" +
+      "translateSelected {" +
+      dxB.toFixed(4) + " " +
+      dyB.toFixed(4) + " " +
+      dzB.toFixed(4) + "};" +
+      
+      "delay 0.04;";
+  }
+  
+  // 动画完成后重新计算点群
+  script += `
+    delay 0.5;
+    calculate pointgroup;
+    draw pointgroup;
+    spin off;
+    background echo "CHCl₃ σᵥ 反射动画完成";
+    delay 0.8;
+    background echo OFF;
+  `;
+  
+  Jmol.script(myJmol, script);
+}
+
+// CHCl₃ σᵥ₁反射：Cl1 ↔ Cl2（带视角保持）
+function playCHCl3SigmaV12() {
+  if (currentFile !== 'CHCl3.mol' || isAnimating) return;
+  
+  isAnimating = true;
+  const btn = document.getElementById("btnSigmaV12");
+  btn.disabled = true;
+  btn.classList.add("active");
+  btn.textContent = "动画播放中...";
+  
+  document.getElementById('op-status').textContent = "正在播放 CHCl₃ σᵥ₁ 反射动画...";
+  document.getElementById('op-status').classList.add('loading');
+  
+  // 直接调用交换函数，函数内部会处理视角保持
+  swapClKeepView(
+    1, 2,
+    {x:-0.0962, y:-1.6789, z:0.1394},
+    {x:-1.4059, y:0.9228, z:0.1394}
+  );
+  
+  // 动画总时间：40步 × 0.04秒 + 0.5秒 + 0.8秒 = 2.9秒
+  setTimeout(() => {
+    isAnimating = false;
+    btn.disabled = false;
+    btn.classList.remove("active");
+    btn.textContent = "σᵥ₁（Cl1 ↔ Cl2）";
+    
+    // 更新状态
+    document.getElementById('op-status').classList.remove('loading');
+    document.getElementById('op-status').textContent = "CHCl₃ σᵥ₁ 反射动画完成";
+    
+    // 延迟后恢复状态显示
+    setTimeout(() => {
+      document.getElementById('op-status').textContent = "可用操作: C₃";
+    }, 1500);
+  }, 3500);
+}
+
+// CHCl₃ σᵥ₂反射：Cl2 ↔ Cl3（带视角保持）
+function playCHCl3SigmaV23() {
+  if (currentFile !== 'CHCl3.mol' || isAnimating) return;
+  
+  isAnimating = true;
+  const btn = document.getElementById("btnSigmaV23");
+  btn.disabled = true;
+  btn.classList.add("active");
+  btn.textContent = "动画播放中...";
+  
+  document.getElementById('op-status').textContent = "正在播放 CHCl₃ σᵥ₂ 反射动画...";
+  document.getElementById('op-status').classList.add('loading');
+  
+  // 直接调用交换函数，函数内部会处理视角保持
+  swapClKeepView(
+    2, 3,
+    {x:-1.4059, y:0.9228, z:0.1394},
+    {x:1.5022, y:0.7561, z:0.1393}
+  );
+  
+  setTimeout(() => {
+    isAnimating = false;
+    btn.disabled = false;
+    btn.classList.remove("active");
+    btn.textContent = "σᵥ₂（Cl2 ↔ Cl3）";
+    
+    // 更新状态
+    document.getElementById('op-status').classList.remove('loading');
+    document.getElementById('op-status').textContent = "CHCl₃ σᵥ₂ 反射动画完成";
+    
+    // 延迟后恢复状态显示
+    setTimeout(() => {
+      document.getElementById('op-status').textContent = "可用操作: C₃";
+    }, 1500);
+  }, 3500);
+}
+
+// CHCl₃ σᵥ₃反射：Cl3 ↔ Cl1（带视角保持）
+function playCHCl3SigmaV31() {
+  if (currentFile !== 'CHCl3.mol' || isAnimating) return;
+  
+  isAnimating = true;
+  const btn = document.getElementById("btnSigmaV31");
+  btn.disabled = true;
+  btn.classList.add("active");
+  btn.textContent = "动画播放中...";
+  
+  document.getElementById('op-status').textContent = "正在播放 CHCl₃ σᵥ₃ 反射动画...";
+  document.getElementById('op-status').classList.add('loading');
+  
+  // 直接调用交换函数，函数内部会处理视角保持
+  swapClKeepView(
+    3, 1,
+    {x:1.5022, y:0.7561, z:0.1393},
+    {x:-0.0962, y:-1.6789, z:0.1394}
+  );
+  
+  setTimeout(() => {
+    isAnimating = false;
+    btn.disabled = false;
+    btn.classList.remove("active");
+    btn.textContent = "σᵥ₃（Cl3 ↔ Cl1）";
+    
+    // 更新状态
+    document.getElementById('op-status').classList.remove('loading');
+    document.getElementById('op-status').textContent = "CHCl₃ σᵥ₃ 反射动画完成";
+    
+    // 延迟后恢复状态显示
+    setTimeout(() => {
+      document.getElementById('op-status').textContent = "可用操作: C₃";
+    }, 1500);
+  }, 3500);
+}
+
+// CO₂的反演操作i动画（带视角保持）
+function playInversion() {
+  if (currentFile !== 'CO2.mol' || isAnimating) return;
+
+  isAnimating = true;
+  const btn = document.getElementById("btnInversion");
+  btn.disabled = true;
+  btn.classList.add("active");
+  btn.textContent = "动画播放中...";
+  
+  document.getElementById('op-status').textContent = "正在播放反演操作 i 动画...";
+  document.getElementById('op-status').classList.add('loading');
+
+  // 保存当前视角并重置模型
+  saveViewAndReset(co2BaseModel);
+  
+  let script = "set echo off; delay 0.4;";
+
+  const steps = 36;
+  const totalAnimationSeconds = 2.0;
+  const delayPerStep = totalAnimationSeconds / steps;
+  const x0 = 1.197;  // CO₂中氧原子的x坐标
+  const dx = (-2 * x0) / steps;  // 每个步长移动的距离
+
+  // 两个氧原子通过碳原子（原点）反演交换位置
+  for (let i = 0; i < steps; i++) {
+    script += `
+      select atomno=1;
+      translateSelected {${(-dx).toFixed(6)} 0 0};
+      select atomno=2;
+      translateSelected {${dx.toFixed(6)} 0 0};
+      delay ${delayPerStep.toFixed(3)};
+    `;
+  }
+
+  // 动画完成后，重新计算点群并重新绘制
+  script += `
+    delay 0.5;
+    calculate pointgroup;
+    draw pointgroup;
+    spin off;
+    background echo "反演操作 i 动画完成";
+    delay 0.8;
+    background echo OFF;
+  `;
+
+  Jmol.script(myJmol, script);
+
+  setTimeout(() => {
+    isAnimating = false;
+    btn.disabled = false;
+    btn.classList.remove("active");
+    btn.textContent = "播放反演操作 i";
+    
+    // 更新状态
+    document.getElementById('op-status').classList.remove('loading');
+    document.getElementById('op-status').textContent = "反演操作 i 动画完成，C₂ 操作已恢复";
+    
+    // 延迟后恢复状态显示
+    setTimeout(() => {
+      document.getElementById('op-status').textContent = "可用操作: C₂";
+    }, 1500);
+  }, (totalAnimationSeconds + 1.8) * 1000);
+}
+
+// 重置视图函数
+function resetView() {
+  if (isAnimating || !currentFile) return;
+  
+  // 重置加载当前分子
+  resetAndLoadMol(currentFile, currentDisplayName);
+}
+
+// 页面加载完成后初始化
+window.onload = function() {
+  // 初始化分子按钮
+  initMoleculeButtons();
+  
+  // 初始加载水分子
+  setTimeout(() => {
+    selectMol('water.xyz', [2], 'H₂O');
+  }, 300);
+};
+
+// 窗口大小变化时重新调整JSmol大小
+window.addEventListener('resize', function() {
+  // JSmol会自动适应容器大小，但我们可以强制刷新一下
+  Jmol.script(myJmol, 'refresh');
+});
+</script>
 </body>
 </html>
