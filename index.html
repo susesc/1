@@ -270,6 +270,33 @@ button:disabled {
 }
 .benz-inv-btn:hover { background: linear-gradient(180deg,#f3e8ff,#e9d5ff); border-color: #9333ea; color: #581c87; }
 .benz-inv-btn:disabled { opacity:.5; cursor:not-allowed; }
+
+/* PtCl4 D4h button styles */
+.ptcl4-rot-btn {
+  background: linear-gradient(180deg,#eff6ff,#dbeafe);
+  border-color: #3b82f6; color: #1d4ed8;
+}
+.ptcl4-rot-btn:hover { background:linear-gradient(180deg,#dbeafe,#bfdbfe); border-color:#2563eb; color:#1e40af; }
+.ptcl4-rot-btn:disabled { opacity:.5; cursor:not-allowed; }
+.ptcl4-inv-btn {
+  background: linear-gradient(180deg,#fdf4ff,#f3e8ff);
+  border-color: #a855f7; color: #6b21a8;
+}
+.ptcl4-inv-btn:hover { background:linear-gradient(180deg,#f3e8ff,#e9d5ff); border-color:#9333ea; color:#581c87; }
+.ptcl4-inv-btn:disabled { opacity:.5; cursor:not-allowed; }
+.ptcl4-s4-btn {
+  background: linear-gradient(180deg,#fdf2f8,#fce7f3);
+  border-color: #d946ef; color: #701a75;
+}
+.ptcl4-s4-btn:hover { background:linear-gradient(180deg,#fce7f3,#f5d0fe); border-color:#c026d3; color:#4a044e; }
+.ptcl4-s4-btn:disabled { opacity:.5; cursor:not-allowed; }
+.ptcl4-sig-btn {
+  background: linear-gradient(180deg,#ecfeff,#cffafe);
+  border-color: #0891b2; color: #0c4a6e;
+}
+.ptcl4-sig-btn:hover { background:linear-gradient(180deg,#cffafe,#a5f3fc); border-color:#0e7490; color:#083344; }
+.ptcl4-sig-btn:disabled { opacity:.5; cursor:not-allowed; }
+
 /* σd button style - teal/cyan theme */
 .sigmad-btn {
   background: linear-gradient(180deg,#ecfeff,#cffafe);
@@ -291,6 +318,33 @@ button:disabled {
   flex-wrap: wrap;
   gap: 4px;
   margin-top: 8px;
+}
+/* 点群标注切换按钮 */
+.pg-annot-btn {
+  background: linear-gradient(180deg,#f0f4ff,#e0e8ff);
+  border-color: #6366f1;
+  color: #3730a3;
+}
+.pg-annot-btn:hover {
+  background: linear-gradient(180deg,#e0e8ff,#c7d2fe);
+  border-color: #4f46e5;
+  color: #312e81;
+  transform: translateY(-1px);
+}
+.pg-annot-btn.pg-annot-on {
+  background: linear-gradient(180deg,#c7d2fe,#a5b4fc);
+  border-color: #4f46e5;
+  color: #312e81;
+}
+.pg-annot-btn.pg-annot-on:hover {
+  background: linear-gradient(180deg,#a5b4fc,#818cf8);
+  border-color: #4338ca;
+  color: #1e1b4b;
+}
+.pg-annot-btn.pg-annot-computing {
+  opacity: 0.7;
+  cursor: wait;
+  transform: none;
 }
 
 /* 恒等操作提示遮罩 */
@@ -383,6 +437,7 @@ button:disabled {
       <button class="pg-btn" onclick="selectPointGroup('D4h')">D₄ʰ 点群</button>
       <button class="pg-btn" onclick="selectPointGroup('D3d')">D₃d 点群</button>
       <button class="pg-btn" onclick="selectPointGroup('D5d')">D₅d 点群</button>
+      <button class="pg-btn" onclick="selectPointGroup('Td')">T<sub>d</sub> 点群</button>
       <div class="status-indicator" id="pg-status">当前显示: 全部分子</div>
     </div>
 
@@ -534,6 +589,39 @@ button:disabled {
       </div>
     </div>
 
+    <!-- PtCl₄²⁻ D4h 对称操作演示面板 -->
+    <div class="section hidden" id="ptcl4SpecialSection">
+      <div class="section-title">[PtCl₄]²⁻（D₄ʰ）对称操作动画</div>
+
+      <div style="font-size:12px;color:#1d4ed8;font-weight:600;padding-left:2px;margin-bottom:2px;">旋转操作（Cₙ 轴）</div>
+      <button id="btnPtC4_CCW"    class="ptcl4-rot-btn"  onclick="playPtcl4C4()">C₄（逆时针90°）</button>
+      <button id="btnPtC2_z"      class="ptcl4-rot-btn"  onclick="playPtcl4C2z()">C₂（主轴，180°）</button>
+      <button id="btnPtC2p_x"     class="ptcl4-rot-btn"  onclick="playPtcl4C2prime('x')">C₂′（x 轴，左右互换）</button>
+      <button id="btnPtC2p_y"     class="ptcl4-rot-btn"  onclick="playPtcl4C2prime('y')">C₂′（y 轴，上下互换）</button>
+      <button id="btnPtC2pp_45"   class="ptcl4-rot-btn"  onclick="playPtcl4C2prime('d1')">C₂″（45° 对角线）</button>
+      <button id="btnPtC2pp_135"  class="ptcl4-rot-btn"  onclick="playPtcl4C2prime('d2')">C₂″（135° 对角线）</button>
+
+      <div style="font-size:12px;color:#6b21a8;font-weight:600;padding-left:2px;margin:6px 0 2px;">反演操作</div>
+      <button id="btnPtInv"       class="ptcl4-inv-btn"  onclick="playPtcl4Inv()">反演操作 i（穿越 Pt）</button>
+
+      <div style="font-size:12px;color:#d946ef;font-weight:600;padding-left:2px;margin:6px 0 2px;">旋转反射轴</div>
+      <button id="btnPtS4"        class="ptcl4-s4-btn"   onclick="playPtcl4S4()">S₄（逆时针90° + 反射）</button>
+
+      <div style="font-size:12px;color:#0891b2;font-weight:600;padding-left:2px;margin:6px 0 2px;">反射操作（镜面 σ）</div>
+      <button id="btnPtSigH"      class="ptcl4-sig-btn identity-btn" onclick="playPtcl4SigmaH()">σₕ（水平面，恒等）</button>
+      <button id="btnPtSigV1"     class="ptcl4-sig-btn"  onclick="playPtcl4Swap([[2,5]], '上下互换', 'btnPtSigV1', 'σᵥ（xz）完成：Cl₂↔Cl₅')">σᵥ（xz 面，上下互换）</button>
+      <button id="btnPtSigV2"     class="ptcl4-sig-btn"  onclick="playPtcl4Swap([[3,4]], '左右互换', 'btnPtSigV2', 'σᵥ（yz）完成：Cl₃↔Cl₄')">σᵥ（yz 面，左右互换）</button>
+      <button id="btnPtSigD1"     class="ptcl4-sig-btn"  onclick="playPtcl4Swap([[2,3],[4,5]], '右上↔左下互换', 'btnPtSigD1', 'σd（45°）完成：Cl₂↔Cl₃，Cl₄↔Cl₅')">σd（45°，右上↔左下）</button>
+      <button id="btnPtSigD2"     class="ptcl4-sig-btn"  onclick="playPtcl4Swap([[2,4],[3,5]], '左上↔右下互换', 'btnPtSigD2', 'σd（135°）完成：Cl₂↔Cl₄，Cl₃↔Cl₅')">σd（135°，左上↔右下）</button>
+
+      <div class="note" style="margin-top:6px;">
+        <span style="color:#1d4ed8;">• 所有操作</span>：动画完成后自动恢复原始构型<br>
+        <span style="color:#6b21a8;">• i</span>：四个 Cl 沿直线穿过 Pt 核心到达对称位置，再返回<br>
+        <span style="color:#d946ef;">• S₄</span>：旋转90°同时反射，再返回（完整演示）<br>
+        <span style="color:#0891b2;">• σ</span>：σₕ 为恒等操作；σᵥ/σd 互换并返回原位
+      </div>
+    </div>
+
     <div class="section hidden" id="ferroceneSpecialSection">
       <div class="section-title">二茂铁（D₅d）对称操作动画</div>
 
@@ -571,6 +659,7 @@ button:disabled {
       <button id="btnC4" class="hidden" onclick="doCnWithReset(4)">C₄</button>
       <button id="btnC5" class="hidden" onclick="doCnWithReset(5)">C₅</button>
       <button id="btnC6" class="hidden" onclick="doCnWithReset(6)">C₆</button>
+
       <div class="status-indicator" id="op-status">可用操作: C₂</div>
     </div>
 
@@ -579,7 +668,8 @@ button:disabled {
       <button onclick="resetView()">重置视图</button>
       <button onclick="Jmol.script(myJmol, 'spin on;')">自动旋转</button>
       <button onclick="Jmol.script(myJmol, 'spin off;')">停止旋转</button>
-      <div class="note">重置视图可以恢复分子的原始状态</div>
+      <button id="btnTogglePG" class="pg-annot-btn" onclick="togglePointGroupAnnotation()">显示点群标注</button>
+      <div class="note">重置视图可以恢复分子的原始状态；点群标注会高亮对称轴与镜面</div>
     </div>
 
   </div>
@@ -620,7 +710,8 @@ var molecules = [
   {file: "H2CCCH2.mol", displayName: "H₂CCCH₂", pointGroup: "D2h", cnList: [2]},
   {file: "PtCl4(e2-).mol", displayName: "PtCl₄²⁻", pointGroup: "D4h", cnList: [4,2]},
   {file: "cyclohexane_chair.xyz", displayName: "环己烷椅式构型", pointGroup: "D3d", cnList: [3,2]},
-  {file: "ferrocene.xyz", displayName: "二茂铁", pointGroup: "D5d", cnList: [5,2]}
+  {file: "ferrocene.xyz", displayName: "二茂铁", pointGroup: "D5d", cnList: [5,2]},
+  {file: "tetrahedron.xyz", displayName: "正四面体", pointGroup: "Td", cnList: [3,2]}
 ];
 
 var pointGroupText = {
@@ -638,7 +729,8 @@ var pointGroupText = {
   "PtCl4(e2-).mol":  { name:"D₄ʰ", text:"平方平面 PtCl₄²⁻ 属于 D₄ʰ 点群，具有 C₄ 主轴与 σₕ。" },
   "SbCl5(e2-).mol":  { name:"D₃ʰ", text:"SbCl₅²⁻ 为三角双锥构型，属于 D₃ʰ 点群。" },
   "cyclohexane_chair.xyz": { name:"D₃d", text:"环己烷椅式构型属于 D₃d 点群，具有一个 C₃ 主轴、三个 C₂ 轴、反演中心 i 和三个 σd 镜面。其 S₆ 非真旋转轴（S₆ = C₆·σₕ）是该点群的重要对称元素。" },
-  "ferrocene.xyz":         { name:"D₅d", text:"二茂铁（交错构型）属于 D₅d 点群，具有一个 C₅ 主轴、五个 C₂ 轴、反演中心和镜面等对称元素。" }
+  "ferrocene.xyz":         { name:"D₅d", text:"二茂铁（交错构型）属于 D₅d 点群，具有一个 C₅ 主轴、五个 C₂ 轴、反演中心和镜面等对称元素。" },
+  "tetrahedron.xyz": { name:"T<sub>d</sub>", text:"正四面体属于 T<sub>d</sub> 点群。它具有 4 条 C₃ 轴（过顶角）、3 条 C₂ 轴（过对边中点连线），以及 3 条 S₄ 轴和 6 个 σ<sub>d</sub> 镜面。本演示通过多面体渲染展示其封闭结构。" }
 };
 
 // ================================================================
@@ -1268,26 +1360,15 @@ function resetAndLoadMol(file, displayName) {
   statusEl.classList.add('loading');
   if (file === 'cyclohexane_chair.xyz') {
     const baseScript = buildChairBaseScript();
-    Jmol.script(myJmol, baseScript + `
-      spin off;
-      calculate pointgroup;
-      draw pointgroup;
-    `);
+    Jmol.script(myJmol, baseScript + 'spin off;');
   } else if (file === 'h3c-ccl3.mol') {
-    Jmol.script(myJmol, ch3ccl3BaseModel + `
-      spin off;
-      calculate pointgroup;
-      draw pointgroup;
-    `);
+    Jmol.script(myJmol, ch3ccl3BaseModel + 'spin off;');
+  } else if (file === 'PtCl4(e2-).mol') {
+    Jmol.script(myJmol, ptcl4BaseModel + 'spin off;');
+  } else if (file === 'tetrahedron.xyz') {
+    Jmol.script(myJmol, buildTetraBaseScript() + 'spin off;');
   } else {
-    Jmol.script(myJmol, `
-      load ${file}
-      center
-      zoom 120
-      spin off
-      calculate pointgroup
-      draw pointgroup
-    `);
+    Jmol.script(myJmol, `load ${file}\ncenter\nzoom 120\nspin off`);
   }
   updateButtons();
   updatePointGroupInfo(file, displayName || file.split('.')[0]);
@@ -1301,6 +1382,9 @@ function resetAndLoadMol(file, displayName) {
       document.getElementById('op-status').textContent = '此分子无可用的Cₙ对称操作';
     }
     isAnimating = false;
+    // 模型重载后点群标注自动消失，同步按钮状态
+    pgAnnotationVisible = false;
+    _syncPGAnnotationButton();
   }, 800);
 }
 
@@ -1341,20 +1425,14 @@ function updateSpecialSectionVisibility() {
   const bf3Section = document.getElementById("bf3SpecialSection");
   const ch3ccl3Section = document.getElementById("ch3ccl3SpecialSection");
   const benzeneSection = document.getElementById("benzeneSpecialSection");
+  const ptcl4Section = document.getElementById("ptcl4SpecialSection");
+  const tetraSection = document.getElementById("tetrahedronSpecialSection");
 
-  h2oSection.classList.add("hidden");
-  c2h2cl2Section.classList.add("hidden");
-  chcl3Section.classList.add("hidden");
-  co2Section.classList.add("hidden");
-  ethyleneC2Section.classList.add("hidden");
-  ethyleneSpecialSection.classList.add("hidden");
-  cyclohexaneSection.classList.add("hidden");
-  cyclohexaneS6Section.classList.add("hidden");
-  cyclohexaneSigmaDSection.classList.add("hidden");
-  ferroceneSection.classList.add("hidden");
-  bf3Section.classList.add("hidden");
-  ch3ccl3Section.classList.add("hidden");
-  benzeneSection.classList.add("hidden");
+  [h2oSection, c2h2cl2Section, chcl3Section, co2Section,
+   ethyleneC2Section, ethyleneSpecialSection, cyclohexaneSection,
+   cyclohexaneS6Section, cyclohexaneSigmaDSection, ferroceneSection,
+   bf3Section, ch3ccl3Section, benzeneSection, ptcl4Section, tetraSection
+  ].forEach(s => s && s.classList.add("hidden"));
 
   if (currentFile === 'water.xyz') {
     h2oSection.classList.remove("hidden");
@@ -1379,6 +1457,11 @@ function updateSpecialSectionVisibility() {
     ch3ccl3Section.classList.remove("hidden");
   } else if (currentFile === 'C6H6.mol') {
     benzeneSection.classList.remove("hidden");
+  } else if (currentFile === 'PtCl4(e2-).mol') {
+    ptcl4Section.classList.remove("hidden");
+  } else if (currentFile === 'tetrahedron.xyz') {
+    const ts = document.getElementById("tetrahedronSpecialSection");
+    if (ts) ts.classList.remove("hidden");
   }
 }
 
@@ -1885,49 +1968,142 @@ function playFerroceneInversion() {
 // 原有功能
 // ================================================================
 
+// ================================================================
+// 点群标注 显示/隐藏 切换（独立于 isAnimating，不干扰其他操作）
+// ================================================================
+var pgAnnotationVisible = false;
+var _pgAnnotationComputing = false;
+
+/**
+ * 同步按钮外观，不改变任何业务状态。
+ */
+function _syncPGAnnotationButton() {
+  var btn = document.getElementById('btnTogglePG');
+  if (!btn) return;
+  btn.disabled = false;
+  btn.classList.remove('pg-annot-on', 'pg-annot-computing');
+  if (pgAnnotationVisible) {
+    btn.textContent = '隐藏点群标注';
+    btn.classList.add('pg-annot-on');
+  } else {
+    btn.textContent = '显示点群标注';
+  }
+}
+
+/**
+ * 生成当前分子的"干净基础模型加载脚本 + restore orientation"字符串。
+ * 仅供标注切换使用，不影响 currentFile / currentCn 等任何全局状态。
+ */
+function _pgBaseLoadScript(savedOriName) {
+  var restore = 'restore orientation ' + savedOriName + ';';
+  if (currentFile === 'cyclohexane_chair.xyz') {
+    return buildChairBaseScript() + restore;
+  } else if (currentFile === 'h3c-ccl3.mol') {
+    return ch3ccl3BaseModel + restore;
+  } else if (currentFile === 'PtCl4(e2-).mol') {
+    return ptcl4BaseModel + restore;
+  } else if (currentFile === 'tetrahedron.xyz') {
+    return buildTetraBaseScript() + restore;
+  } else if (currentFile === 'ferrocene.xyz') {
+    return ferroceneStaggeredBaseModel + restore;
+  } else {
+    return 'load ' + currentFile + '\ncenter\nzoom 120\nspin off\n' + restore;
+  }
+}
+
+/**
+ * 显示或隐藏当前分子的点群标注。
+ *
+ * 设计约束（不与其他操作冲突）：
+ *   • 本函数从不修改 isAnimating。
+ *   • 其他操作进行中（isAnimating = true）时，静默返回，按钮不响应。
+ *   • 用 _pgAnnotationComputing 防止本函数自身重入。
+ *   • 显示时先 save orientation → 重载干净模型 → calculate+draw → restore orientation，
+ *     全程视角不变、不影响其他操作的基础模型状态。
+ *   • 隐藏时仅发 draw pointgroup off，零副作用。
+ */
+function togglePointGroupAnnotation() {
+  // 其他操作进行中，或本函数正在计算中，直接忽略
+  if (isAnimating || _pgAnnotationComputing) return;
+  if (!currentFile) return;
+
+  var btn = document.getElementById('btnTogglePG');
+
+  if (pgAnnotationVisible) {
+    // ── 隐藏：直接关闭标注，无需重载模型 ──
+    Jmol.script(myJmol, 'draw pointgroup off;');
+    pgAnnotationVisible = false;
+    _syncPGAnnotationButton();
+  } else {
+    // ── 显示：重载干净基础模型 → 计算点群 → 绘制标注 ──
+    _pgAnnotationComputing = true;
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add('pg-annot-computing');
+      btn.textContent = '计算中…';
+    }
+
+    // 1. 保存当前视角
+    Jmol.script(myJmol, 'save orientation _pgOri;');
+
+    // 2. 加载干净基础模型并恢复视角（500 ms 让 Jmol 完成渲染）
+    setTimeout(function() {
+      Jmol.script(myJmol, _pgBaseLoadScript('_pgOri'));
+
+      // 3. 计算点群并绘制标注（700 ms 后，模型已稳定）
+      setTimeout(function() {
+        Jmol.script(myJmol, 'calculate pointgroup; draw pointgroup;');
+
+        // 4. 等待绘制完成（400 ms）后更新按钮
+        setTimeout(function() {
+          pgAnnotationVisible = true;
+          _pgAnnotationComputing = false;
+          _syncPGAnnotationButton();
+        }, 400);
+      }, 700);
+    }, 500);
+  }
+}
+
 function doCnWithReset(n) {
   if (isAnimating) return;
   isAnimating = true;
   const opStatus = document.getElementById('op-status');
-  opStatus.textContent = `正在执行 C${n} 旋转（加速模式）...`;
+  opStatus.textContent = `正在执行 C${n} 旋转...`;
   opStatus.classList.add('loading');
   Jmol.script(myJmol, "save orientation userView;");
   if (currentFile === 'cyclohexane_chair.xyz') {
     const baseScript = buildChairBaseScript();
-    Jmol.script(myJmol, baseScript + `
-      spin off;
-      calculate pointgroup;
-      draw pointgroup;
-      restore orientation userView;
-    `);
+    Jmol.script(myJmol, baseScript + 'spin off; restore orientation userView;');
   } else if (currentFile === 'h3c-ccl3.mol') {
-    Jmol.script(myJmol, ch3ccl3BaseModel + `
-      spin off;
-      calculate pointgroup;
-      draw pointgroup;
-      restore orientation userView;
-    `);
+    Jmol.script(myJmol, ch3ccl3BaseModel + 'spin off; restore orientation userView;');
+  } else if (currentFile === 'PtCl4(e2-).mol') {
+    Jmol.script(myJmol, ptcl4BaseModel + 'spin off; restore orientation userView;');
+  } else if (currentFile === 'tetrahedron.xyz') {
+    Jmol.script(myJmol, buildTetraBaseScript() + 'spin off; restore orientation userView;');
   } else {
-    Jmol.script(myJmol, `
-      load ${currentFile}
-      center
-      zoom 120
-      spin off
-      calculate pointgroup
-      draw pointgroup
-      restore orientation userView;
-    `);
+    Jmol.script(myJmol, `load ${currentFile}\ncenter\nzoom 120\nspin off\nrestore orientation userView;`);
   }
+  // Step 1: wait for model to load, then calculate point group to create named axis objects
   setTimeout(() => {
-    const angle = 360 / n;
-    Jmol.script(myJmol, `spin $pgva_0_c${n}_1 ${angle} 400`);
-    opStatus.textContent = `正在执行 C${n} 旋转（角度: ${angle}°，速度: 400）`;
+    Jmol.script(myJmol, 'calculate pointgroup; draw pointgroup;');
+    // Step 2: wait for pointgroup calculation, then spin the Cn axis
     setTimeout(() => {
-      isAnimating = false;
-      opStatus.classList.remove('loading');
-      opStatus.textContent = `可用操作: ${currentCn.map(n => 'C' + n).join(', ')}`;
-    }, 2000);
-  }, 400);
+      const angle = 360 / n;
+      opStatus.textContent = `正在执行 C${n} 旋转（角度: ${angle}°）`;
+      const spinDuration = Math.round(angle / 360 * 1000) + 800;
+      Jmol.script(myJmol, `spin $pgva_0_c${n}_1 ${angle} 360`);
+      setTimeout(() => {
+        Jmol.script(myJmol, 'draw pointgroup off;');
+        isAnimating = false;
+        opStatus.classList.remove('loading');
+        opStatus.textContent = `C${n} 旋转完成 | 可用操作: ${currentCn.map(m => 'C' + m).join(', ')}`;
+        setTimeout(() => {
+          if (!isAnimating) opStatus.textContent = `可用操作: ${currentCn.map(m => 'C' + m).join(', ')}`;
+        }, 2000);
+      }, spinDuration);
+    }, 700);
+  }, 500);
 }
 
 function playSigmaVxz() {
@@ -2839,6 +3015,43 @@ color hydrogen white;
 center;
 zoom 120;
 `;
+const ptcl4BaseModel = `load data "ptcl4 mol"
+PtCl4
+  D4h
+
+  5  4  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0 V2000
+    0.0000    0.0000    0.0000 Pt  0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    2.3115    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0
+    2.3115    0.0000    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0
+   -2.3115    0.0000    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -2.3115    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0
+  1  2  1  0
+  1  3  1  0
+  1  4  1  0
+  1  5  1  0
+M  END
+end "ptcl4 mol"
+
+set antialiasDisplay;
+set zoomLarge false;
+spacefill 25%;
+wireframe 0.18;
+color platinum [192,192,192];
+color chlorine [0,200,80];
+label %e;
+center;
+zoom 115;
+`;
+
+var ptcl4Atoms = {
+  1: [0.0000,  0.0000, 0.0],
+  2: [0.0000,  2.3115, 0.0],
+  3: [2.3115,  0.0000, 0.0],
+  4: [-2.3115, 0.0000, 0.0],
+  5: [0.0000, -2.3115, 0.0]
+};
+const ptR = 2.3115;
+
 
 var benzeneAtoms = {
   1:  [ 1.2078, -0.6973, 0.0],  // C
@@ -3082,10 +3295,590 @@ function playBenzInversion() {
   }, 400);
 }
 
+
+// ================================================================
+// 正四面体（Td）对称操作动画
+// 设计：动画时保留一个透明静态参考四面体，只移动线框版本
+// S4 完成后两者完美重合
+// ================================================================
+
+const tetraCoord = 1.0;
+function getTetraAtoms() {
+  return [
+    {el: 'P', x:  tetraCoord, y:  tetraCoord, z:  tetraCoord},
+    {el: 'P', x:  tetraCoord, y: -tetraCoord, z: -tetraCoord},
+    {el: 'P', x: -tetraCoord, y:  tetraCoord, z: -tetraCoord},
+    {el: 'P', x: -tetraCoord, y: -tetraCoord, z:  tetraCoord}
+  ];
+}
+
+function buildTetraXyzStr(atoms, title) {
+  let s = atoms.length + "\n" + (title || 'tetrahedron') + "\n";
+  atoms.forEach(a => { s += a.el + " " + a.x.toFixed(6) + " " + a.y.toFixed(6) + " " + a.z.toFixed(6) + "\n"; });
+  return s;
+}
+
+function buildTetraBaseScript() {
+  const atoms = getTetraAtoms();
+  const xyz = buildTetraXyzStr(atoms, 'tetrahedron Td');
+  return "load data \"tetra xyz\"\n" + xyz + "end \"tetra xyz\"\n" +
+    "set zoomlarge false; set antialiasDisplay;\n" +
+    "spacefill 25%; wireframe 0.12;\n" +
+    "color atoms gold;\n" +
+    "connect 1 2; connect 1 3; connect 1 4; connect 2 3; connect 2 4; connect 3 4;\n" +
+    "polyhedra bond translucent 0.45;\n" +
+    "center; zoom 130;\n";
+}
+
+var tetraS4Intermediate = null;
+
+function setTetraButtons(disabled, activeId) {
+  ['btnTetraS4Full','btnTetraS4Step1','btnTetraS4Step2','btnTetraSd1'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.disabled = disabled;
+    btn.classList.toggle('active', !!(activeId && id === activeId));
+  });
+}
+
+function playTetraS4Step1() {
+  if (currentFile !== 'tetrahedron.xyz' || isAnimating) return;
+  isAnimating = true;
+  setTetraButtons(true, 'btnTetraS4Step1');
+  document.getElementById('btnTetraS4Step1').textContent = '第①步 旋转中...';
+  const opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'Td S4 第①步：绕Z轴旋转 90°...';
+  opStatus.classList.add('loading');
+
+  const baseAtoms = getTetraAtoms();
+  const rotatedAtoms = baseAtoms.map(a => ({el:a.el, x:-a.y, y:a.x, z:a.z}));
+  tetraS4Intermediate = rotatedAtoms;
+
+  const xyz = buildTetraXyzStr(baseAtoms, 'tetrahedron Td');
+  const loadScript = "load data \"tetra xyz\"\n" + xyz + "end \"tetra xyz\"\n" +
+    "set zoomlarge false; set antialiasDisplay; spacefill 25%; wireframe 0.12;\n" +
+    "color atoms gold; connect 1 2; connect 1 3; connect 1 4; connect 2 3; connect 2 4; connect 3 4;\n" +
+    "polyhedra bond translucent 0.45; center; zoom 130;\n";
+
+  Jmol.script(myJmol, 'save orientation tetraView;');
+  Jmol.script(myJmol, loadScript + 'restore orientation tetraView;');
+
+  const steps = 25, delay = 0.02;
+  setTimeout(() => {
+    let script = 'set echo off; delay 0.15;';
+    for (let k = 0; k < steps; k++) {
+      for (let i = 0; i < baseAtoms.length; i++) {
+        const dx = ((rotatedAtoms[i].x - baseAtoms[i].x) / steps).toFixed(6);
+        const dy = ((rotatedAtoms[i].y - baseAtoms[i].y) / steps).toFixed(6);
+        const dz = ((rotatedAtoms[i].z - baseAtoms[i].z) / steps).toFixed(6);
+        script += "select atomno=" + (i+1) + "; translateSelected {" + dx + " " + dy + " " + dz + "};";
+      }
+      script += "delay " + delay + ";";
+    }
+    script += 'delay 0.3; background echo "第①步完成：旋转90°中间态"; delay 0.8; background echo OFF;';
+    Jmol.script(myJmol, script);
+    setTimeout(() => {
+      isAnimating = false;
+      setTetraButtons(false, null);
+      document.getElementById('btnTetraS4Step1').textContent = '第①步：C₄(z) 旋转 90° ✓';
+      opStatus.classList.remove('loading');
+      opStatus.textContent = '第①步完成：已旋转90°，请点击第②步';
+    }, (steps * delay + 1.2) * 1000);
+  }, 500);
+}
+
+function playTetraS4Step2() {
+  if (currentFile !== 'tetrahedron.xyz' || isAnimating) return;
+  if (!tetraS4Intermediate) {
+    showIdentityMessage('<div class="identity-dialog-title">请先执行第①步</div><div class="identity-dialog-body"><p>请先点击 <strong>"第①步：C₄(z) 旋转 90°"</strong>，完成旋转后再点击第②步进行 σₕ 反射。</p><p style="margin-top:8px;color:#6b7280;">点击"确认"关闭提示。</p></div>');
+    return;
+  }
+  isAnimating = true;
+  setTetraButtons(true, 'btnTetraS4Step2');
+  document.getElementById('btnTetraS4Step2').textContent = '第②步 反射中...';
+  const opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'Td S4 第②步：σh 反射 (z → -z)...';
+  opStatus.classList.add('loading');
+
+  const fromAtoms = tetraS4Intermediate;
+  const toAtoms = fromAtoms.map(a => ({el:a.el, x:a.x, y:a.y, z:-a.z}));
+
+  const interXyz = buildTetraXyzStr(fromAtoms, 'tetra_inter');
+  const loadScript = "load data \"tetra_inter xyz\"\n" + interXyz + "end \"tetra_inter xyz\"\n" +
+    "set zoomlarge false; set antialiasDisplay; spacefill 25%; wireframe 0.15;\n" +
+    "color atoms gold; connect 1 2; connect 1 3; connect 1 4; connect 2 3; connect 2 4; connect 3 4;\n" +
+    "polyhedra bond translucent 0.45; center; zoom 130;\n";
+
+  Jmol.script(myJmol, 'save orientation tetraView;');
+  Jmol.script(myJmol, loadScript + 'restore orientation tetraView;');
+
+  const steps = 25, delay = 0.02;
+  setTimeout(() => {
+    let script = 'set echo off; delay 0.15;';
+    for (let k = 0; k < steps; k++) {
+      for (let i = 0; i < fromAtoms.length; i++) {
+        const dx = ((toAtoms[i].x - fromAtoms[i].x) / steps).toFixed(6);
+        const dy = ((toAtoms[i].y - fromAtoms[i].y) / steps).toFixed(6);
+        const dz = ((toAtoms[i].z - fromAtoms[i].z) / steps).toFixed(6);
+        script += "select atomno=" + (i+1) + "; translateSelected {" + dx + " " + dy + " " + dz + "};";
+      }
+      script += "delay " + delay + ";";
+    }
+    script += 'delay 0.35; background echo "S4 完成！恢复正四面体构型"; delay 1.0; background echo OFF;';
+    Jmol.script(myJmol, script);
+    setTimeout(() => {
+      isAnimating = false;
+      tetraS4Intermediate = null;
+      setTetraButtons(false, null);
+      document.getElementById('btnTetraS4Step2').textContent = '第②步：σₕ(xy) 反射';
+      document.getElementById('btnTetraS4Step1').textContent = '第①步：C₄(z) 旋转 90°';
+      opStatus.classList.remove('loading');
+      opStatus.textContent = 'S4 完成！旋转90° + σh反射 = 恢复正四面体';
+      setTimeout(() => { if (!isAnimating) opStatus.textContent = '可用操作: C₃, C₂'; }, 3000);
+    }, (steps * delay + 1.5) * 1000);
+  }, 500);
+}
+
+function playTetraS4Full() {
+  if (currentFile !== 'tetrahedron.xyz' || isAnimating) return;
+  isAnimating = true;
+  setTetraButtons(true, 'btnTetraS4Full');
+  document.getElementById('btnTetraS4Full').textContent = 'S4 动画播放中...';
+  const opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'S4 完整：旋转90° + 反射...';
+  opStatus.classList.add('loading');
+
+  const baseAtoms = getTetraAtoms();
+  const rotatedAtoms = baseAtoms.map(a => ({el:a.el, x:-a.y, y:a.x, z:a.z}));
+  const finalAtoms   = rotatedAtoms.map(a => ({el:a.el, x:a.x, y:a.y, z:-a.z}));
+
+  // Load: wireframe animated version + static translucent reference drawn via draw command
+  const xyz = buildTetraXyzStr(baseAtoms, 'tetrahedron Td');
+  const loadScript = "load data \"tetra xyz\"\n" + xyz + "end \"tetra xyz\"\n" +
+    "set zoomlarge false; set antialiasDisplay;\n" +
+    "spacefill 0%; wireframe 0.22; color atoms [255,140,0];\n" +
+    "connect 1 2; connect 1 3; connect 1 4; connect 2 3; connect 2 4; connect 3 4;\n" +
+    "polyhedra off; center; zoom 130;\n" +
+    "draw tRef1 POLYGON 4 {1 1 1} {1 -1 -1} {-1 -1 1} {-1 1 -1} color translucent 0.72 [180,180,255];\n" +
+    "draw tRef2 POLYGON 4 {1 1 1} {1 -1 -1} {-1 1 -1} {1 1 1} color translucent 0.72 [180,180,255];\n" +
+    "draw tRef3 POLYGON 4 {1 1 1} {-1 -1 1} {-1 1 -1} {1 1 1} color translucent 0.72 [180,180,255];\n" +
+    "draw tRef4 POLYGON 4 {1 -1 -1} {-1 -1 1} {-1 1 -1} {1 -1 -1} color translucent 0.72 [180,180,255];\n";
+
+  Jmol.script(myJmol, 'save orientation tetraView;');
+  Jmol.script(myJmol, loadScript + 'restore orientation tetraView;');
+
+  const steps1 = 25, steps2 = 25, delay = 0.02;
+  setTimeout(() => {
+    let script = 'set echo off; delay 0.15;';
+    for (let k = 0; k < steps1; k++) {
+      for (let i = 0; i < baseAtoms.length; i++) {
+        const dx = ((rotatedAtoms[i].x - baseAtoms[i].x) / steps1).toFixed(6);
+        const dy = ((rotatedAtoms[i].y - baseAtoms[i].y) / steps1).toFixed(6);
+        const dz = ((rotatedAtoms[i].z - baseAtoms[i].z) / steps1).toFixed(6);
+        script += "select atomno=" + (i+1) + "; translateSelected {" + dx + " " + dy + " " + dz + "};";
+      }
+      script += "delay " + delay + ";";
+    }
+    script += "delay 0.25;";
+    for (let k = 0; k < steps2; k++) {
+      for (let i = 0; i < rotatedAtoms.length; i++) {
+        const dx = ((finalAtoms[i].x - rotatedAtoms[i].x) / steps2).toFixed(6);
+        const dy = ((finalAtoms[i].y - rotatedAtoms[i].y) / steps2).toFixed(6);
+        const dz = ((finalAtoms[i].z - rotatedAtoms[i].z) / steps2).toFixed(6);
+        script += "select atomno=" + (i+1) + "; translateSelected {" + dx + " " + dy + " " + dz + "};";
+      }
+      script += "delay " + delay + ";";
+    }
+    script += 'delay 0.4; draw tRef1 off; draw tRef2 off; draw tRef3 off; draw tRef4 off; background echo "S4 完成！线框与静态参考重合，正四面体"; delay 0.8; background echo OFF;';
+    Jmol.script(myJmol, script);
+
+    const total = (steps1*delay + steps2*delay + 1.6) * 1000;
+    setTimeout(() => {
+      isAnimating = false;
+      tetraS4Intermediate = null;
+      setTetraButtons(false, null);
+      document.getElementById('btnTetraS4Full').textContent = '▶ S₄ 完整操作（旋转90° + 反射）';
+      opStatus.classList.remove('loading');
+      opStatus.textContent = 'S4 操作完成';
+      setTimeout(() => { if (!isAnimating) opStatus.textContent = '可用操作: C₃, C₂'; }, 2500);
+    }, total);
+  }, 500);
+}
+
+function playTetraSigmaD() {
+  if (currentFile !== 'tetrahedron.xyz' || isAnimating) return;
+  isAnimating = true;
+  setTetraButtons(true, 'btnTetraSd1');
+  document.getElementById('btnTetraSd1').textContent = 'σd₁ 动画中...';
+  const opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'σd 镜面反射：顶点2↔顶点3互换...';
+  opStatus.classList.add('loading');
+
+  const baseAtoms = getTetraAtoms();
+  const finalAtoms = baseAtoms.map(a => ({el:a.el, x:a.y, y:a.x, z:a.z}));
+
+  const xyz = buildTetraXyzStr(baseAtoms, 'tetrahedron Td');
+  const loadScript = "load data \"tetra xyz\"\n" + xyz + "end \"tetra xyz\"\n" +
+    "set zoomlarge false; set antialiasDisplay;\n" +
+    "spacefill 0%; wireframe 0.22; color atoms [255,140,0];\n" +
+    "connect 1 2; connect 1 3; connect 1 4; connect 2 3; connect 2 4; connect 3 4;\n" +
+    "polyhedra off; center; zoom 130;\n" +
+    "draw sdRef1 POLYGON 4 {1 1 1} {1 -1 -1} {-1 -1 1} {-1 1 -1} color translucent 0.72 [180,255,180];\n" +
+    "draw sdRef2 POLYGON 4 {1 1 1} {1 -1 -1} {-1 1 -1} {1 1 1} color translucent 0.72 [180,255,180];\n" +
+    "draw sdRef3 POLYGON 4 {1 1 1} {-1 -1 1} {-1 1 -1} {1 1 1} color translucent 0.72 [180,255,180];\n" +
+    "draw sdRef4 POLYGON 4 {1 -1 -1} {-1 -1 1} {-1 1 -1} {1 -1 -1} color translucent 0.72 [180,255,180];\n";
+
+  Jmol.script(myJmol, 'save orientation tetraView;');
+  Jmol.script(myJmol, loadScript + 'restore orientation tetraView;');
+
+  const steps = 25, delay = 0.02;
+  setTimeout(() => {
+    let script = 'set echo off; delay 0.15;';
+    for (let k = 0; k < steps; k++) {
+      for (let i = 0; i < baseAtoms.length; i++) {
+        const dx = ((finalAtoms[i].x - baseAtoms[i].x) / steps).toFixed(6);
+        const dy = ((finalAtoms[i].y - baseAtoms[i].y) / steps).toFixed(6);
+        const dz = ((finalAtoms[i].z - baseAtoms[i].z) / steps).toFixed(6);
+        script += "select atomno=" + (i+1) + "; translateSelected {" + dx + " " + dy + " " + dz + "};";
+      }
+      script += "delay " + delay + ";";
+    }
+    script += 'delay 0.4; draw sdRef1 off; draw sdRef2 off; draw sdRef3 off; draw sdRef4 off; background echo "σd₁ 完成：顶点2↔顶点3互换，线框与参考重合"; delay 0.8; background echo OFF;';
+    Jmol.script(myJmol, script);
+    setTimeout(() => {
+      isAnimating = false;
+      setTetraButtons(false, null);
+      document.getElementById('btnTetraSd1').textContent = 'σd₁（顶点2↔顶点3互换）';
+      opStatus.classList.remove('loading');
+      opStatus.textContent = 'σd₁ 完成';
+      setTimeout(() => { if (!isAnimating) opStatus.textContent = '可用操作: C₃, C₂'; }, 2000);
+    }, (steps * delay + 1.3) * 1000);
+  }, 500);
+}
+
+
+
+
+
+// ================================================================
+// [PtCl4]²- D4h 对称操作动画
+// Cl2=上(y+), Cl3=右(x+), Cl4=左(x-), Cl5=下(y-)
+// 所有动画完成后自动恢复原构型
+// ================================================================
+
+function setPtcl4Buttons(disabled, activeId) {
+  ['btnPtC4_CCW','btnPtC2_z','btnPtC2p_x','btnPtC2p_y','btnPtC2pp_45','btnPtC2pp_135',
+   'btnPtInv','btnPtS4','btnPtSigH','btnPtSigV1','btnPtSigV2','btnPtSigD1','btnPtSigD2'
+  ].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.disabled = disabled;
+    btn.classList.toggle('active', !!(activeId && id === activeId));
+  });
+}
+
+function loadPtcl4Base(afterLoad) {
+  Jmol.script(myJmol, 'save orientation ptView;');
+  Jmol.script(myJmol, ptcl4BaseModel + 'restore orientation ptView;');
+  if (afterLoad) setTimeout(afterLoad, 350);
+}
+
+function ptcl4BuildSwapScript(pairs, steps, d) {
+  var script = '';
+  for (var k = 0; k < steps; k++) {
+    pairs.forEach(function(pair) {
+      var idA = pair[0], idB = pair[1];
+      var A = ptcl4Atoms[idA], B = ptcl4Atoms[idB];
+      var dxA = ((B[0]-A[0])/steps).toFixed(5);
+      var dyA = ((B[1]-A[1])/steps).toFixed(5);
+      var dzA = ((B[2]-A[2])/steps).toFixed(5);
+      var dxB = ((A[0]-B[0])/steps).toFixed(5);
+      var dyB = ((A[1]-B[1])/steps).toFixed(5);
+      var dzB = ((A[2]-B[2])/steps).toFixed(5);
+      script += 'select atomno=' + idA + '; translateSelected {' + dxA + ' ' + dyA + ' ' + dzA + '};';
+      script += 'select atomno=' + idB + '; translateSelected {' + dxB + ' ' + dyB + ' ' + dzB + '};';
+    });
+    script += 'delay ' + d + ';';
+  }
+  return script;
+}
+
+// 通用 σ 反射（互换 + 返回）
+function playPtcl4Swap(pairs, labelDesc, btnId, doneMsg) {
+  if (currentFile !== 'PtCl4(e2-).mol' || isAnimating) return;
+  isAnimating = true;
+  setPtcl4Buttons(true, btnId);
+  var btn = document.getElementById(btnId);
+  var origText = btn ? btn.textContent : '';
+  if (btn) btn.textContent = labelDesc + ' 中...';
+  var opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'PtCl4 σ反射：' + labelDesc + '...';
+  opStatus.classList.add('loading');
+  loadPtcl4Base(function() {
+    var steps = 20, d = 0.025;
+    var script = 'set echo off; delay 0.1;';
+    script += ptcl4BuildSwapScript(pairs, steps, d);
+    script += 'delay 0.4; background echo "' + doneMsg + '"; delay 0.5; background echo OFF; delay 0.1;';
+    script += ptcl4BuildSwapScript(pairs, steps, d);
+    script += 'delay 0.3;';
+    Jmol.script(myJmol, script);
+    var total = (steps * d * 2 + 1.4) * 1000;
+    setTimeout(function() {
+      isAnimating = false;
+      setPtcl4Buttons(false, null);
+      if (btn) btn.textContent = origText;
+      opStatus.classList.remove('loading');
+      opStatus.textContent = doneMsg + '（已恢复原构型）';
+      setTimeout(function() { if (!isAnimating) opStatus.textContent = '可用操作: C4'; }, 2000);
+    }, total);
+  });
+}
+
+// 反演 i：Cl 沿直线穿过 Pt 到对侧，然后返回
+function playPtcl4Inv() {
+  if (currentFile !== 'PtCl4(e2-).mol' || isAnimating) return;
+  isAnimating = true;
+  setPtcl4Buttons(true, 'btnPtInv');
+  var btn = document.getElementById('btnPtInv');
+  btn.textContent = '反演动画中...';
+  var opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'PtCl4 反演操作 i：Cl 穿过 Pt 到对侧...';
+  opStatus.classList.add('loading');
+  loadPtcl4Base(function() {
+    var steps = 20, d = 0.03;
+    var script = 'set echo off; delay 0.1;';
+    // Forward: each Cl moves to -position (through Pt center)
+    for (var k = 0; k < steps; k++) {
+      [2,3,4,5].forEach(function(id) {
+        var x = ptcl4Atoms[id][0], y = ptcl4Atoms[id][1], z = ptcl4Atoms[id][2];
+        var dx = (-2*x/steps).toFixed(5);
+        var dy = (-2*y/steps).toFixed(5);
+        var dz = (-2*z/steps).toFixed(5);
+        script += 'select atomno=' + id + '; translateSelected {' + dx + ' ' + dy + ' ' + dz + '};';
+      });
+      script += 'delay ' + d + ';';
+    }
+    script += 'delay 0.4; background echo "反演 i 完成：Cl2↔Cl5，Cl3↔Cl4，经 Pt 核心"; delay 0.5; background echo OFF; delay 0.1;';
+    // Return
+    for (var k = 0; k < steps; k++) {
+      [2,3,4,5].forEach(function(id) {
+        var x = ptcl4Atoms[id][0], y = ptcl4Atoms[id][1], z = ptcl4Atoms[id][2];
+        var dx = (2*x/steps).toFixed(5);
+        var dy = (2*y/steps).toFixed(5);
+        var dz = (2*z/steps).toFixed(5);
+        script += 'select atomno=' + id + '; translateSelected {' + dx + ' ' + dy + ' ' + dz + '};';
+      });
+      script += 'delay ' + d + ';';
+    }
+    script += 'delay 0.3;';
+    Jmol.script(myJmol, script);
+    var total = (steps * d * 2 + 1.4) * 1000;
+    setTimeout(function() {
+      isAnimating = false;
+      setPtcl4Buttons(false, null);
+      btn.textContent = '反演操作 i（穿越 Pt）';
+      opStatus.classList.remove('loading');
+      opStatus.textContent = '反演 i 完成（已恢复原构型）';
+      setTimeout(function() { if (!isAnimating) opStatus.textContent = '可用操作: C4'; }, 2000);
+    }, total);
+  });
+}
+
+// σh 恒等操作弹窗
+function playPtcl4SigmaH() {
+  if (currentFile !== 'PtCl4(e2-).mol' || isAnimating) return;
+  isAnimating = true;
+  setPtcl4Buttons(true, 'btnPtSigH');
+  var btn = document.getElementById('btnPtSigH');
+  btn.textContent = '执行恒等操作...';
+  var opStatus = document.getElementById('op-status');
+  opStatus.classList.remove('loading');
+  opStatus.textContent = 'σh：分子平面（xy 面），所有原子均在其上，反射后完全不变';
+  loadPtcl4Base(null);
+  showIdentityMessage('<div class="identity-dialog-title">σₕ 水平反射：恒等操作</div><div class="identity-dialog-body"><p>[PtCl₄]²⁻ 的 <strong>σₕ</strong> 是分子自身所在平面（xy 平面）。Pt 和全部四个 Cl 原子的 z 坐标均为 0，全部位于该平面内。</p><p>在该水平面反射下，<strong>每个原子都映射回自身</strong>，分子外观与结构完全不变。这是 D₄ʰ 点群的水平镜面，其效果等同于恒等操作 E。</p><p style="margin-top:8px;color:#6b7280;">点击"确认"关闭本提示后，可以继续进行其它操作。</p></div>');
+  setTimeout(function() {
+    setPtcl4Buttons(false, null);
+    btn.textContent = 'σₕ（水平面，恒等）';
+  }, 300);
+}
+
+// C4 逆时针90°（用 translateSelected 弧线），完成后返回
+function playPtcl4C4() {
+  if (currentFile !== 'PtCl4(e2-).mol' || isAnimating) return;
+  isAnimating = true;
+  setPtcl4Buttons(true, 'btnPtC4_CCW');
+  var btn = document.getElementById('btnPtC4_CCW');
+  btn.textContent = 'C4 旋转中...';
+  var opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'PtCl4 C4：逆时针旋转 90°...';
+  opStatus.classList.add('loading');
+  Jmol.script(myJmol, 'save orientation ptView;');
+  Jmol.script(myJmol, ptcl4BaseModel + 'restore orientation ptView;');
+  // CCW 90°: (x,y) -> (-y, x)
+  // Cl2(0,ptR) -> (-ptR,0)=Cl4 pos
+  // Cl3(ptR,0) -> (0,ptR)=Cl2 pos
+  // Cl4(-ptR,0) -> (0,-ptR)=Cl5 pos
+  // Cl5(0,-ptR) -> (ptR,0)=Cl3 pos
+  var targets = {2:[-ptR,0,0], 3:[0,ptR,0], 4:[0,-ptR,0], 5:[ptR,0,0]};
+  var steps = 25, d = 0.022;
+  setTimeout(function() {
+    var script = 'set echo off; delay 0.1;';
+    for (var k = 0; k < steps; k++) {
+      [2,3,4,5].forEach(function(id) {
+        var s = ptcl4Atoms[id], t = targets[id];
+        var dx = ((t[0]-s[0])/steps).toFixed(5);
+        var dy = ((t[1]-s[1])/steps).toFixed(5);
+        var dz = ((t[2]-s[2])/steps).toFixed(5);
+        script += 'select atomno=' + id + '; translateSelected {' + dx + ' ' + dy + ' ' + dz + '};';
+      });
+      script += 'delay ' + d + ';';
+    }
+    script += 'delay 0.4; background echo "C4 完成：逆时针90°，Cl2→左,Cl3→上,Cl4→下,Cl5→右"; delay 0.5; background echo OFF; delay 0.1;';
+    // Return
+    for (var k = 0; k < steps; k++) {
+      [2,3,4,5].forEach(function(id) {
+        var s = ptcl4Atoms[id], t = targets[id];
+        var dx = ((s[0]-t[0])/steps).toFixed(5);
+        var dy = ((s[1]-t[1])/steps).toFixed(5);
+        var dz = ((s[2]-t[2])/steps).toFixed(5);
+        script += 'select atomno=' + id + '; translateSelected {' + dx + ' ' + dy + ' ' + dz + '};';
+      });
+      script += 'delay ' + d + ';';
+    }
+    script += 'delay 0.3;';
+    Jmol.script(myJmol, script);
+    var total = (steps * d * 2 + 1.4) * 1000;
+    setTimeout(function() {
+      isAnimating = false;
+      setPtcl4Buttons(false, null);
+      btn.textContent = 'C₄（逆时针90°）';
+      opStatus.classList.remove('loading');
+      opStatus.textContent = 'C4 完成（已恢复原构型）';
+      setTimeout(function() { if (!isAnimating) opStatus.textContent = '可用操作: C4'; }, 2000);
+    }, total);
+  }, 400);
+}
+
+// C2(z) 主轴180°，用 spin，完成后恢复模型
+function playPtcl4C2z() {
+  if (currentFile !== 'PtCl4(e2-).mol' || isAnimating) return;
+  isAnimating = true;
+  setPtcl4Buttons(true, 'btnPtC2_z');
+  var btn = document.getElementById('btnPtC2_z');
+  btn.textContent = 'C2 旋转中...';
+  var opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'PtCl4 C2(z)：主轴旋转 180°...';
+  opStatus.classList.add('loading');
+  Jmol.script(myJmol, 'save orientation ptView;');
+  Jmol.script(myJmol, ptcl4BaseModel + 'restore orientation ptView;');
+  setTimeout(function() {
+    Jmol.script(myJmol, 'calculate pointgroup; draw pointgroup;');
+    setTimeout(function() {
+      Jmol.script(myJmol, 'spin $pgva_0_c4_1 180 250; delay 1.5;');
+      setTimeout(function() {
+        loadPtcl4Base(function() {
+          isAnimating = false;
+          setPtcl4Buttons(false, null);
+          btn.textContent = 'C₂（主轴，180°）';
+          opStatus.classList.remove('loading');
+          opStatus.textContent = 'C2(z) 完成（已恢复原构型）';
+          setTimeout(function() { if (!isAnimating) opStatus.textContent = '可用操作: C4'; }, 2000);
+        });
+      }, 2200);
+    }, 600);
+  }, 400);
+}
+
+// C2' / C2'' 旋转：用 spin 命令
+function playPtcl4C2prime(axis) {
+  if (currentFile !== 'PtCl4(e2-).mol' || isAnimating) return;
+  isAnimating = true;
+  var btnMap = {x:'btnPtC2p_x', y:'btnPtC2p_y', d1:'btnPtC2pp_45', d2:'btnPtC2pp_135'};
+  // 修复 descMap 中的字符串错误：使用双引号避免单引号冲突
+  var descMap = {x: "C2'(x轴)", y: "C2'(y轴)", d1: "C2''(45°)", d2: "C2''(135°)"};
+  var spinMap = {x:'pgva_0_c2_1', y:'pgva_0_c2_2', d1:'pgva_0_c2_3', d2:'pgva_0_c2_4'};
+  var btnId = btnMap[axis];
+  setPtcl4Buttons(true, btnId);
+  var btn = document.getElementById(btnId);
+  var origText = btn ? btn.textContent : '';
+  if (btn) btn.textContent = descMap[axis] + ' 旋转中...';
+  var opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'PtCl4 ' + descMap[axis] + '：旋转 180°...';
+  opStatus.classList.add('loading');
+  Jmol.script(myJmol, 'save orientation ptView;');
+  Jmol.script(myJmol, ptcl4BaseModel + 'restore orientation ptView;');
+  setTimeout(function() {
+    Jmol.script(myJmol, 'calculate pointgroup; draw pointgroup;');
+    setTimeout(function() {
+      Jmol.script(myJmol, 'spin $' + spinMap[axis] + ' 180 250; delay 1.5;');
+      setTimeout(function() {
+        loadPtcl4Base(function() {
+          isAnimating = false;
+          setPtcl4Buttons(false, null);
+          if (btn) btn.textContent = origText;
+          opStatus.classList.remove('loading');
+          opStatus.textContent = descMap[axis] + ' 完成（已恢复原构型）';
+          setTimeout(function() { if (!isAnimating) opStatus.textContent = '可用操作: C4'; }, 2000);
+        });
+      }, 2200);
+    }, 600);
+  }, 400);
+}
+
+// S4：逆时针90°（同 C4 旋转）再返回（因平面分子 σh = 恒等）
+function playPtcl4S4() {
+  if (currentFile !== 'PtCl4(e2-).mol' || isAnimating) return;
+  isAnimating = true;
+  setPtcl4Buttons(true, 'btnPtS4');
+  var btn = document.getElementById('btnPtS4');
+  btn.textContent = 'S4 动画中...';
+  var opStatus = document.getElementById('op-status');
+  opStatus.textContent = 'PtCl4 S4：逆时针90° + σh 反射...';
+  opStatus.classList.add('loading');
+  loadPtcl4Base(function() {
+    var targets = {2:[-ptR,0,0], 3:[0,ptR,0], 4:[0,-ptR,0], 5:[ptR,0,0]};
+    var steps = 22, d = 0.025;
+    var script = 'set echo off; delay 0.1;';
+    for (var k = 0; k < steps; k++) {
+      [2,3,4,5].forEach(function(id) {
+        var s = ptcl4Atoms[id], t = targets[id];
+        var dx = ((t[0]-s[0])/steps).toFixed(5);
+        var dy = ((t[1]-s[1])/steps).toFixed(5);
+        var dz = ((t[2]-s[2])/steps).toFixed(5);
+        script += 'select atomno=' + id + '; translateSelected {' + dx + ' ' + dy + ' ' + dz + '};';
+      });
+      script += 'delay ' + d + ';';
+    }
+    script += 'delay 0.4; background echo "S4 完成：旋转90°+σh，[PtCl4]2- 恢复原状"; delay 0.5; background echo OFF; delay 0.1;';
+    for (var k = 0; k < steps; k++) {
+      [2,3,4,5].forEach(function(id) {
+        var s = ptcl4Atoms[id], t = targets[id];
+        var dx = ((s[0]-t[0])/steps).toFixed(5);
+        var dy = ((s[1]-t[1])/steps).toFixed(5);
+        var dz = ((s[2]-t[2])/steps).toFixed(5);
+        script += 'select atomno=' + id + '; translateSelected {' + dx + ' ' + dy + ' ' + dz + '};';
+      });
+      script += 'delay ' + d + ';';
+    }
+    script += 'delay 0.3;';
+    Jmol.script(myJmol, script);
+    var total = (steps * d * 2 + 1.4) * 1000;
+    setTimeout(function() {
+      isAnimating = false;
+      setPtcl4Buttons(false, null);
+      btn.textContent = 'S₄（逆时针90° + 反射）';
+      opStatus.classList.remove('loading');
+      opStatus.textContent = 'S4 完成（已恢复原构型）';
+      setTimeout(function() { if (!isAnimating) opStatus.textContent = '可用操作: C4'; }, 2000);
+    }, total);
+  });
+}
+
 function resetView() {
   if (isAnimating || !currentFile) return;
   s6IntermediateAtoms = null;
   ferroceneS10IntermediateAtoms = null;
+  tetraS4Intermediate = null;
   if (currentFile === 'CO2.mol') {
     co2C2primeClickCount = 0;
     const btn = document.getElementById('btnCo2C2prime');
